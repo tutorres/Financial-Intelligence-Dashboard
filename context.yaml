@@ -1,0 +1,204 @@
+project:
+  name: Financial Intelligence Dashboard
+  description: >
+    End-to-end financial data pipeline with ML-based trend prediction and
+    a natural language chat interface powered by LLMs. Built as a public
+    portfolio project to demonstrate skills in data engineering, machine
+    learning, and generative AI.
+  status: in_development
+  deploy_target: Streamlit Cloud
+  repository: github.com/torres-arthur/financial-intelligence-dashboard  # update when created
+
+author:
+  name: Arthur Torres
+  role: Computer Engineering student & Data/Automation Intern
+  stack_level:
+    python: advanced
+    sql: advanced
+    pytorch: learning
+    llm_integration: intermediate
+
+goals:
+  primary:
+    - Demonstrate end-to-end data pipeline skills
+    - Apply ML (LSTM) to real financial data
+    - Integrate LLM for natural language querying
+    - Showcase data engineering best practices (bronze/silver/gold)
+  secondary:
+    - Build in public (GitHub history from day one)
+    - Deploy a live, accessible demo
+    - Serve as portfolio centerpiece for data/AI job applications
+
+architecture:
+  layers:
+    bronze:
+      description: Raw data ingestion — no transformation
+      source: Yahoo Finance API (yfinance)
+      storage: DuckDB
+      content:
+        - Raw OHLCV data (Open, High, Low, Close, Volume)
+        - Ingestion timestamp
+        - Ticker symbol
+
+    silver:
+      description: Cleaned and enriched data
+      transformations:
+        - Null handling and deduplication
+        - Moving averages (7d, 21d, 50d)
+        - Daily returns and volatility
+        - RSI (Relative Strength Index)
+        - MACD
+      storage: DuckDB
+
+    gold:
+      description: Business-ready, model-ready data
+      content:
+        - Aggregated metrics per ticker
+        - Feature-engineered dataset for LSTM input
+        - Summary stats for dashboard consumption
+      storage: DuckDB
+
+tech_stack:
+  data_collection:
+    library: yfinance
+    description: Free Yahoo Finance API wrapper for Python
+    assets: stocks, ETFs, crypto (BTC-USD, ETH-USD)
+
+  storage:
+    library: duckdb
+    description: Embedded analytical database, fast for local pipeline use
+    alternative: sqlite (simpler, use if DuckDB causes friction)
+
+  analysis:
+    - pandas
+    - numpy
+
+  visualization:
+    - plotly (interactive charts)
+    - streamlit (dashboard framework and deploy)
+
+  machine_learning:
+    framework: pytorch
+    model: LSTM (Long Short-Term Memory)
+    task: Stock trend classification (up / down / neutral)
+    input_features:
+      - close price (normalized)
+      - volume
+      - moving averages (7d, 21d)
+      - RSI
+      - daily return
+    sequence_length: 30  # days of history per prediction
+    output: trend direction for next N days
+
+  generative_ai:
+    provider: Groq
+    reason: Free tier, fast inference, supports open-source LLMs
+    model: llama3-8b-8192  # or mixtral-8x7b — both free on Groq
+    use_case: >
+      Natural language chat interface. User asks questions in Portuguese
+      or English about the financial data (e.g. "Which stock had the best
+      performance this month?") and the LLM queries the gold layer to respond.
+    pattern: Text-to-SQL or tool-calling over DuckDB gold tables
+
+pipeline:
+  orchestration: Python scripts with schedule or APScheduler (lightweight)
+  frequency: daily ingestion (after market close)
+  flow:
+    - ingest raw data → bronze
+    - clean and enrich → silver
+    - aggregate and prepare → gold
+    - retrain or run inference → ML model
+    - serve dashboard + chat → Streamlit
+
+roadmap:
+  weekly_hours: 2
+  total_weeks: 16
+  phases:
+    - phase: 1
+      weeks: "1-2"
+      title: Foundation
+      tasks:
+        - Set up GitHub repository with clear folder structure
+        - Install and configure DuckDB
+        - Implement yfinance ingestion for 5-10 tickers
+        - Save raw data to bronze layer
+        - Write basic README
+
+    - phase: 2
+      weeks: "3-5"
+      title: Analysis & Dashboard
+      tasks:
+        - Build silver layer transformations (moving averages, RSI, MACD)
+        - Exploratory data analysis with Pandas
+        - Build interactive Streamlit dashboard with Plotly charts
+        - Price history, volume, indicators per ticker
+
+    - phase: 3
+      weeks: "6-9"
+      title: Data Engineering
+      tasks:
+        - Build gold layer aggregations
+        - Automate daily pipeline with APScheduler
+        - Add data validation and basic logging
+        - Document pipeline architecture in README
+
+    - phase: 4
+      weeks: "10-13"
+      title: ML — LSTM with PyTorch
+      tasks:
+        - Prepare feature-engineered dataset for LSTM
+        - Build and train LSTM model in PyTorch
+        - Evaluate model (accuracy, confusion matrix)
+        - Display predictions in Streamlit dashboard
+
+    - phase: 5
+      weeks: "14-16"
+      title: LLM Chat & Deploy
+      tasks:
+        - Integrate Groq API for natural language queries
+        - Build chat interface in Streamlit
+        - Connect LLM to gold layer data
+        - Write full documentation
+        - Deploy to Streamlit Cloud
+
+suggested_tickers:
+  stocks:
+    - AAPL   # Apple
+    - MSFT   # Microsoft
+    - GOOGL  # Alphabet
+    - NVDA   # NVIDIA
+    - PETR4.SA  # Petrobras (Brazilian market)
+    - VALE3.SA  # Vale (Brazilian market)
+  crypto:
+    - BTC-USD
+    - ETH-USD
+
+folder_structure: |
+  financial-intelligence-dashboard/
+  ├── data/
+  │   ├── bronze/
+  │   ├── silver/
+  │   └── gold/
+  ├── pipeline/
+  │   ├── ingest.py
+  │   ├── transform.py
+  │   └── aggregate.py
+  ├── ml/
+  │   ├── dataset.py
+  │   ├── model.py
+  │   ├── train.py
+  │   └── predict.py
+  ├── chat/
+  │   └── agent.py
+  ├── dashboard/
+  │   └── app.py
+  ├── context.yaml
+  ├── requirements.txt
+  └── README.md
+
+conventions:
+  language: Python 3.11+
+  style: PEP8, type hints encouraged
+  commits: conventional commits (feat:, fix:, data:, ml:, docs:)
+  branching: main (stable) + feature branches
+  secrets: never hardcode API keys — use .env + python-dotenv
