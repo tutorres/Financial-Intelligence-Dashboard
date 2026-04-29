@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from pipeline.utils import get_connection as _get_conn
+from pipeline.utils import TICKERS, get_connection as _get_conn
 
 
 @st.cache_resource
@@ -13,9 +13,12 @@ def _get_db_connection():
 
 
 def load_summary(conn, ticker: str) -> dict | None:
-    row = conn.execute(
-        "SELECT * FROM gold.summary WHERE ticker = ?", [ticker]
-    ).fetchdf()
+    row = conn.execute("""
+        SELECT ticker, last_updated, last_close,
+               pct_change_1d, pct_change_7d, pct_change_30d,
+               avg_volume_30d, current_rsi
+        FROM gold.summary WHERE ticker = ?
+    """, [ticker]).fetchdf()
     if row.empty:
         return None
     return row.iloc[0].to_dict()
@@ -23,12 +26,14 @@ def load_summary(conn, ticker: str) -> dict | None:
 
 def load_prices(conn, ticker: str, days: int) -> pd.DataFrame:
     cutoff = date.today() - timedelta(days=days)
-    return conn.execute(
-        """SELECT * FROM silver.prices
-           WHERE ticker = ? AND date >= ?
-           ORDER BY date""",
-        [ticker, cutoff],
-    ).df()
+    return conn.execute("""
+        SELECT ticker, date, open, high, low, close, volume,
+               daily_return, ma_7, ma_21, ma_50, rsi_14,
+               macd, macd_signal, macd_hist, volatility_21
+        FROM silver.prices
+        WHERE ticker = ? AND date >= ?
+        ORDER BY date
+    """, [ticker, cutoff]).df()
 
 
 def rsi_signal(rsi) -> str:
@@ -64,6 +69,8 @@ def fig_candlestick(df: pd.DataFrame) -> go.Figure:
         ("ma_50", "#6366f1", "MA50"),
     ]:
         valid = df[["date", col]].dropna()
+        if valid.empty:
+            continue
         fig.add_trace(go.Scatter(
             x=valid["date"], y=valid[col],
             name=name, line=dict(color=color, width=1.5),
@@ -127,7 +134,7 @@ def main() -> None:
 
     col1, col2 = st.columns([1, 3])
     with col1:
-        ticker = st.selectbox("Ticker", ["AAPL", "MSFT", "NVDA", "BTC-USD"])
+        ticker = st.selectbox("Ticker", TICKERS)
     with col2:
         time_options = {"30d": 30, "90d": 90, "180d": 180, "1Y": 365}
         selected = st.radio("Time Range", list(time_options.keys()), horizontal=True)
@@ -136,10 +143,12 @@ def main() -> None:
     try:
         df = load_prices(conn, ticker, days)
         summary = load_summary(conn, ticker)
-    except Exception:
-        st.warning("No data found. Run `python pipeline/run.py` first.")
+    except Exception as exc:
+        if "does not exist" in str(exc).lower() or "catalog" in str(exc).lower():
+            st.warning("Pipeline tables not found. Run `python pipeline/run.py` first.")
+        else:
+            st.error(f"Unexpected error loading data: {exc}")
         st.stop()
-        return
 
     if df.empty and summary is None:
         st.warning("No data found. Run `python pipeline/run.py` first.")

@@ -45,8 +45,8 @@ def test_fig_candlestick_all_nan_ma50_skips_trace():
     df_nan = _make_df(60, all_nan_ma50=True)
     fig_full = fig_candlestick(df_full)
     fig_nan = fig_candlestick(df_nan)
-    # all_nan_ma50 df has fewer valid MA traces — the MA50 Scatter is empty/absent
-    assert len(fig_full.data) >= len(fig_nan.data)
+    # MA50 trace is skipped when all values are NaN, so fewer traces
+    assert len(fig_full.data) > len(fig_nan.data)
 
 
 # --- fig_volume ---
