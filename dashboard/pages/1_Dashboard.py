@@ -104,14 +104,52 @@ def main() -> None:
         if df.empty:
             st.info("No data available for this period.")
         else:
+            st.markdown("#### Price History")
+            st.caption(
+                "Each candle represents one trading day. "
+                "A **green candle** means the price closed higher than it opened; **red** means it closed lower. "
+                "The thin lines (wicks) show the intraday high and low. "
+                "The colored lines are moving averages: "
+                "**MA7** (amber) tracks short-term momentum, "
+                "**MA21** (green) shows the monthly trend, and "
+                "**MA50** (indigo) reflects the long-term direction. "
+                "When a shorter MA crosses above a longer one, it's a bullish signal — and vice versa."
+            )
             st.plotly_chart(fig_candlestick(df), use_container_width=True)
+
+            st.markdown("#### Volume")
+            st.caption(
+                "Number of shares (or units) traded each day. "
+                "**High volume on an up day** confirms buying pressure behind the move. "
+                "**High volume on a down day** signals strong selling. "
+                "Low volume moves are less reliable — they can reverse easily. "
+                "Color matches the candle above: green = up day, red = down day."
+            )
             st.plotly_chart(fig_volume(df), use_container_width=True)
 
     with tab3:
         if df.empty:
             st.info("No data available for this period.")
         else:
+            st.markdown("#### RSI — Relative Strength Index (14 days)")
+            st.caption(
+                "Measures how overbought or oversold an asset is, on a scale from 0 to 100. "
+                "**Above 70**: the asset may be overbought — momentum is strong but a pullback is possible. "
+                "**Below 30**: the asset may be oversold — it has fallen fast and a bounce is possible. "
+                "**Between 30 and 70**: neutral territory. "
+                "RSI alone isn't a buy/sell signal — it works best combined with price action and volume."
+            )
             st.plotly_chart(fig_rsi(df), use_container_width=True)
+
+            st.markdown("#### MACD — Moving Average Convergence/Divergence (12 / 26 / 9)")
+            st.caption(
+                "Shows the relationship between two exponential moving averages (12-day and 26-day). "
+                "The **MACD line** (indigo) is the difference between them. "
+                "The **Signal line** (amber) is a 9-day smoothing of the MACD. "
+                "The **histogram** shows the gap between the two: "
+                "green bars mean MACD is above Signal (bullish momentum), red bars mean it's below (bearish). "
+                "A **crossover** — MACD crossing above the Signal line — is a classic buy signal; crossing below is a sell signal."
+            )
             st.plotly_chart(fig_macd(df), use_container_width=True)
 
 
