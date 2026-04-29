@@ -127,72 +127,80 @@ def fig_macd(df: pd.DataFrame) -> go.Figure:
 
 
 def main() -> None:
-    st.set_page_config(page_title="Financial Intelligence Dashboard", layout="wide")
-    st.title("Financial Intelligence Dashboard")
+    st.set_page_config(
+        page_title="Financial Intelligence Dashboard",
+        page_icon="📈",
+        layout="centered",
+    )
 
-    conn = _get_db_connection()
+    st.title("📈 Financial Intelligence Dashboard")
+    st.markdown(
+        "*Real-time stock & crypto analytics — technical indicators, LSTM trend prediction, "
+        "and natural language queries.*"
+    )
 
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        ticker = st.selectbox("Ticker", TICKERS)
-    with col2:
-        time_options = {"30d": 30, "90d": 90, "180d": 180, "1Y": 365}
-        selected = st.radio("Time Range", list(time_options.keys()), horizontal=True)
-        days = time_options[selected]
+    st.divider()
 
-    try:
-        df = load_prices(conn, ticker, days)
-        summary = load_summary(conn, ticker)
-    except Exception as exc:
-        if "does not exist" in str(exc).lower() or "catalog" in str(exc).lower():
-            st.warning("Pipeline tables not found. Run `python pipeline/run.py` first.")
-        else:
-            st.error(f"Unexpected error loading data: {exc}")
-        st.stop()
+    col_btn, _ = st.columns([1, 3])
+    with col_btn:
+        st.page_link("pages/1_Dashboard.py", label="Open Dashboard →", icon="🚀")
 
-    if df.empty and summary is None:
-        st.warning("No data found. Run `python pipeline/run.py` first.")
-        st.stop()
+    st.divider()
 
-    tab1, tab2, tab3 = st.tabs(["Overview", "Price & Volume", "Technical Indicators"])
+    col_desc, col_stack = st.columns([3, 2])
 
-    with tab1:
-        if summary is None:
-            st.info("No summary data available for this ticker.")
-        else:
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("Last Close", f"${summary['last_close']:.2f}")
-            c2.metric("1-day Change",
-                      f"{summary['pct_change_1d']:.2f}%"
-                      if pd.notna(summary["pct_change_1d"]) else "N/A")
-            c3.metric("7-day Change",
-                      f"{summary['pct_change_7d']:.2f}%"
-                      if pd.notna(summary["pct_change_7d"]) else "N/A")
-            c4.metric("30-day Change",
-                      f"{summary['pct_change_30d']:.2f}%"
-                      if pd.notna(summary["pct_change_30d"]) else "N/A")
-            c5, c6 = st.columns(2)
-            c5.metric("Avg Volume (30d)", fmt_volume(summary["avg_volume_30d"]))
-            rsi_val = summary["current_rsi"]
-            c6.metric(
-                "RSI",
-                f"{rsi_val:.1f} — {rsi_signal(rsi_val)}"
-                if pd.notna(rsi_val) else "N/A",
-            )
+    with col_desc:
+        st.markdown("### What it does")
+        st.markdown(
+            "- Ingests daily OHLCV data via **yfinance** for 8 assets\n"
+            "- Processes through **Bronze → Silver → Gold** DuckDB layers\n"
+            "- Computes **RSI, MACD, moving averages (7/21/50d), volatility**\n"
+            "- LSTM trend classification (up / down / neutral) via PyTorch\n"
+            "- Natural language queries via **Groq LLM** (llama3 / mixtral)"
+        )
 
-    with tab2:
-        if df.empty:
-            st.info("No data available for this period.")
-        else:
-            st.plotly_chart(fig_candlestick(df), use_container_width=True)
-            st.plotly_chart(fig_volume(df), use_container_width=True)
+    with col_stack:
+        st.markdown("### Tech Stack")
+        st.markdown(
+            "| Layer | Tech |\n"
+            "|---|---|\n"
+            "| Data | yfinance |\n"
+            "| Storage | DuckDB |\n"
+            "| Charts | Plotly |\n"
+            "| UI | Streamlit |\n"
+            "| ML | PyTorch LSTM |\n"
+            "| LLM | Groq API |"
+        )
 
-    with tab3:
-        if df.empty:
-            st.info("No data available for this period.")
-        else:
-            st.plotly_chart(fig_rsi(df), use_container_width=True)
-            st.plotly_chart(fig_macd(df), use_container_width=True)
+    st.divider()
+
+    st.markdown("### Covered Assets")
+    stocks = [t for t in TICKERS if not t.endswith("-USD")]
+    crypto = [t for t in TICKERS if t.endswith("-USD")]
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("**Stocks**")
+        for t in stocks:
+            st.markdown(f"- `{t}`")
+    with c2:
+        st.markdown("**Crypto**")
+        for t in crypto:
+            st.markdown(f"- `{t}`")
+
+    st.divider()
+
+    st.markdown("### Pipeline Architecture")
+    st.code(
+        "yfinance  →  Bronze (raw OHLCV)\n"
+        "          →  Silver (RSI / MACD / MAs / volatility)\n"
+        "          →  Gold   (aggregated + ML-ready features)\n"
+        "                         ↓\n"
+        "            Streamlit Dashboard  +  LSTM  +  Groq Chat",
+        language=None,
+    )
+
+    st.caption("Built by Arthur Torres · Computer Engineering Portfolio Project")
 
 
 if __name__ == "__main__":
