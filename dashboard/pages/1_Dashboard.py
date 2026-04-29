@@ -17,7 +17,18 @@ from dashboard.app import (
     load_summary,
     rsi_signal,
 )
-from pipeline.utils import TICKERS
+from pipeline.run import run as _run_pipeline
+from pipeline.utils import TICKERS, get_connection as _get_raw_conn
+
+
+def _data_ready() -> bool:
+    conn = _get_raw_conn()
+    try:
+        return conn.execute("SELECT COUNT(*) FROM gold.summary").fetchone()[0] > 0
+    except Exception:
+        return False
+    finally:
+        conn.close()
 
 
 def main() -> None:
@@ -27,6 +38,11 @@ def main() -> None:
         layout="wide",
     )
     st.title("Financial Intelligence Dashboard")
+
+    if not _data_ready():
+        with st.spinner("Fetching market data for the first time — this takes ~30 seconds..."):
+            _run_pipeline()
+        st.rerun()
 
     conn = _get_db_connection()
 
