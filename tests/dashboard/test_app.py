@@ -128,7 +128,6 @@ def test_rsi_signal_none():
 
 
 def test_rsi_signal_nan():
-    import math
     assert rsi_signal(float("nan")) == "N/A"
 
 
