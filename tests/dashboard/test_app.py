@@ -127,6 +127,11 @@ def test_rsi_signal_none():
     assert rsi_signal(None) == "N/A"
 
 
+def test_rsi_signal_nan():
+    import math
+    assert rsi_signal(float("nan")) == "N/A"
+
+
 # --- fmt_volume ---
 
 def test_fmt_volume_millions():

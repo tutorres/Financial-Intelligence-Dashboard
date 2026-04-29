@@ -1,7 +1,6 @@
 from datetime import date, timedelta
 
 import pandas as pd
-import plotly.graph_objects as go
 import streamlit as st
 
 from pipeline.utils import get_connection as _get_conn
