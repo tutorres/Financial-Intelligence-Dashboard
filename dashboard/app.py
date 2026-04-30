@@ -163,81 +163,153 @@ def fig_macd(df: pd.DataFrame) -> go.Figure:
     return fig
 
 
+def _stat_card_html(ticker: str, price, change) -> str:
+    is_up = change is None or change >= 0
+    border = "#00ff88" if is_up else "#ff4d4d"
+    fg = "#00ff88" if is_up else "#ff4d4d"
+    arrow = "▲" if is_up else "▼"
+    price_str = f"${price:,.2f}" if price is not None else "—"
+    change_str = f"{arrow} {abs(change):.2f}%" if change is not None else "—"
+    bars = [("40%","#ff4d4d"),("65%","#00ff88"),("50%","#00ff88"),
+            ("80%","#00ff88"),("70%","#ff4d4d"),("100%","#00ff88")]
+    bars_html = "".join(
+        f'<div style="flex:1;height:{h};background:{c};border-radius:1px"></div>'
+        for h, c in bars
+    )
+    return (
+        f'<div style="background:#141414;border:1px solid #252525;border-left:3px solid {border};'
+        f'padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+        f'<div><div style="font-size:11px;color:#94a3b8;letter-spacing:1px;margin-bottom:4px">{ticker}</div>'
+        f'<div style="font-size:22px;color:#f8fafc;font-weight:700">{price_str}</div></div>'
+        f'<div style="width:64px;height:32px;display:flex;align-items:flex-end;gap:3px">{bars_html}</div>'
+        f'<div style="font-size:14px;font-weight:700;color:{fg}">{change_str}</div></div>'
+    )
+
+
+def _pipeline_step_html(label: str, name: str, desc: str, highlight: bool = False) -> str:
+    border = "border-left:3px solid #00ff88;" if highlight else ""
+    name_color = "#00ff88" if highlight else "#f8fafc"
+    return (
+        f'<div style="background:#141414;border:1px solid #252525;{border}padding:24px 28px;flex:1">'
+        f'<div style="font-size:10px;color:#94a3b8;letter-spacing:2px;margin-bottom:10px">{label}</div>'
+        f'<div style="font-size:18px;color:{name_color};font-weight:700;margin-bottom:8px">{name}</div>'
+        f'<div style="font-size:12px;color:#94a3b8;line-height:1.7">{desc}</div></div>'
+    )
+
+
+def _tech_cell_html(layer: str, name: str, desc: str) -> str:
+    return (
+        f'<div style="background:#0d0d0d;padding:28px 32px">'
+        f'<div style="font-size:10px;color:#00ff88;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase">{layer}</div>'
+        f'<div style="font-size:18px;color:#f8fafc;font-weight:700;margin-bottom:8px">{name}</div>'
+        f'<div style="font-size:13px;color:#94a3b8;line-height:1.7">{desc}</div></div>'
+    )
+
+
+def build_landing_html(stats: list) -> str:
+    placeholders = [
+        {"ticker": "AAPL", "last_close": None, "pct_change_1d": None},
+        {"ticker": "MSFT", "last_close": None, "pct_change_1d": None},
+        {"ticker": "NVDA", "last_close": None, "pct_change_1d": None},
+        {"ticker": "BTC-USD", "last_close": None, "pct_change_1d": None},
+    ]
+    display = stats[:4] if stats else placeholders
+    cards = "".join(
+        _stat_card_html(s["ticker"], s.get("last_close"), s.get("pct_change_1d"))
+        for s in display
+    )
+    arrow = '<span style="color:#00ff88;font-size:22px;display:flex;align-items:center;padding:0 12px;flex-shrink:0">→</span>'
+    pipeline = arrow.join([
+        _pipeline_step_html("LAYER 01", "Bronze", "Raw OHLCV ingestion via yfinance. Stored with ingestion timestamp. No transformations."),
+        _pipeline_step_html("LAYER 02", "Silver", "RSI, MACD, moving averages (7/21/50d), volatility, deduplication, null handling."),
+        _pipeline_step_html("LAYER 03", "Gold", "Per-ticker aggregated stats. Normalized feature sets ready for LSTM input."),
+        _pipeline_step_html("OUTPUT", "Dashboard", "Streamlit + Plotly charts. LSTM predictions. Groq natural language interface.", highlight=True),
+    ])
+    tech = "".join([
+        _tech_cell_html("Data Ingestion", "yfinance + DuckDB", "Daily OHLCV for 8 assets. Columnar storage with Bronze / Silver / Gold warehouse pattern."),
+        _tech_cell_html("Analytics", "pandas + numpy", "RSI (14d), MACD (12/26/9), MA 7/21/50, volatility (21d), daily returns."),
+        _tech_cell_html("Machine Learning", "PyTorch LSTM", "30-day sequence classification. Predicts up / down / neutral trend direction."),
+        _tech_cell_html("UI & Charts", "Streamlit + Plotly", "Candlestick, volume, RSI, MACD charts. Multi-page with landing page."),
+        _tech_cell_html("LLM Interface", "Groq API", "Natural language queries over gold tables. llama3 and mixtral models."),
+        _tech_cell_html("Deployment", "Streamlit Cloud", "Free tier. Auto-deploys from GitHub. Pipeline runs on cold start automatically."),
+    ])
+    assets = "".join(
+        f'<div style="background:#141414;border:1px solid #252525;padding:16px 20px;font-size:14px;color:#f8fafc;letter-spacing:1.5px">{t}</div>'
+        for t in ["AAPL", "MSFT", "GOOGL", "NVDA", "PETR4.SA", "VALE3.SA", "BTC-USD", "ETH-USD"]
+    )
+    return f"""
+<div style="font-family:'Courier New',monospace;background:#0d0d0d;color:#f8fafc">
+  <nav style="border-bottom:1px solid #252525;padding:18px 64px;display:flex;align-items:center;justify-content:space-between">
+    <span style="color:#00ff88;font-size:16px;font-weight:700;letter-spacing:3px">FID_</span>
+    <div style="display:flex;gap:40px">
+      <a href="#pipeline" style="color:#94a3b8;font-size:12px;text-decoration:none;letter-spacing:1.5px">PIPELINE</a>
+      <a href="#stack" style="color:#94a3b8;font-size:12px;text-decoration:none;letter-spacing:1.5px">STACK</a>
+      <a href="#assets" style="color:#94a3b8;font-size:12px;text-decoration:none;letter-spacing:1.5px">ASSETS</a>
+    </div>
+  </nav>
+  <div style="display:flex;align-items:center;gap:80px;padding:96px 64px 80px;border-bottom:1px solid #252525">
+    <div style="flex:1.1">
+      <div style="color:#94a3b8;font-size:13px;margin-bottom:20px">~/<span style="color:#00ff88">financial-intelligence-dashboard</span></div>
+      <div style="color:#94a3b8;font-size:13px;margin-bottom:24px"><span style="color:#00ff88">$ </span>python pipeline/run.py --all-tickers</div>
+      <div style="font-size:52px;font-weight:700;line-height:1.1;color:#f8fafc;margin-bottom:28px;letter-spacing:-1px">Financial<br>Intelligence<br><span style="color:#00ff88">Dashboard</span></div>
+      <div style="margin-bottom:40px">
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:8px"><span style="color:#00ff88">▸</span> Bronze → Silver → Gold <span style="background:#141414;border:1px solid #252525;padding:1px 8px;border-radius:2px;font-size:11px;color:#94a3b8;margin-left:4px">DuckDB</span></div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:8px"><span style="color:#00ff88">▸</span> RSI · MACD · MA 7/21/50 <span style="background:#141414;border:1px solid #252525;padding:1px 8px;border-radius:2px;font-size:11px;color:#94a3b8;margin-left:4px">pandas</span></div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:8px"><span style="color:#00ff88">▸</span> LSTM trend classifier <span style="background:#141414;border:1px solid #252525;padding:1px 8px;border-radius:2px;font-size:11px;color:#94a3b8;margin-left:4px">PyTorch</span></div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:8px"><span style="color:#00ff88">▸</span> Natural language queries <span style="background:#141414;border:1px solid #252525;padding:1px 8px;border-radius:2px;font-size:11px;color:#94a3b8;margin-left:4px">Groq LLM</span></div>
+      </div>
+    </div>
+    <div style="flex:1">
+      <div style="font-size:10px;color:#94a3b8;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px">live market snapshot</div>
+      {cards}
+    </div>
+  </div>
+  <div id="pipeline" style="padding:80px 64px;border-bottom:1px solid #252525">
+    <div style="font-size:11px;color:#00ff88;letter-spacing:3px;text-transform:uppercase;margin-bottom:32px">// data pipeline</div>
+    <div style="display:flex;align-items:stretch">{pipeline}</div>
+  </div>
+  <div id="stack" style="padding:80px 64px;border-bottom:1px solid #252525">
+    <div style="font-size:11px;color:#00ff88;letter-spacing:3px;text-transform:uppercase;margin-bottom:32px">// tech stack</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#252525;border:1px solid #252525">{tech}</div>
+  </div>
+  <div id="assets" style="padding:80px 64px;border-bottom:1px solid #252525">
+    <div style="font-size:11px;color:#00ff88;letter-spacing:3px;text-transform:uppercase;margin-bottom:32px">// covered assets</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">{assets}</div>
+  </div>
+  <div style="padding:40px 64px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:13px;color:#94a3b8">Arthur Torres · Computer Engineering</span>
+    <a href="https://github.com/tutorres/Financial-Intelligence-Dashboard" style="font-size:11px;color:#94a3b8;text-decoration:none;letter-spacing:1px">GitHub</a>
+  </div>
+</div>
+"""
+
+
 def main() -> None:
     st.set_page_config(
         page_title="Financial Intelligence Dashboard",
         page_icon="📈",
-        layout="centered",
+        layout="wide",
     )
+    from dashboard.style import inject_global_css
+    st.markdown(inject_global_css(), unsafe_allow_html=True)
 
-    st.title("📈 Financial Intelligence Dashboard")
-    st.markdown(
-        "*Real-time stock & crypto analytics — technical indicators, LSTM trend prediction, "
-        "and natural language queries.*"
-    )
+    stats: list = []
+    try:
+        conn = _get_conn()
+        df = conn.execute("""
+            SELECT ticker, last_close, pct_change_1d FROM gold.summary
+            WHERE ticker IN ('AAPL','MSFT','NVDA','BTC-USD')
+            ORDER BY CASE ticker
+                WHEN 'AAPL' THEN 1 WHEN 'MSFT' THEN 2
+                WHEN 'NVDA' THEN 3 WHEN 'BTC-USD' THEN 4 END
+        """).fetchdf()
+        conn.close()
+        stats = df.to_dict("records")
+    except Exception:
+        pass
 
-    st.divider()
-
-    col_btn, _ = st.columns([1, 3])
-    with col_btn:
-        st.page_link("pages/1_Dashboard.py", label="Open Dashboard →", icon="🚀")
-
-    st.divider()
-
-    col_desc, col_stack = st.columns([3, 2])
-
-    with col_desc:
-        st.markdown("### What it does")
-        st.markdown(
-            "- Ingests daily OHLCV data via **yfinance** for 8 assets\n"
-            "- Processes through **Bronze → Silver → Gold** DuckDB layers\n"
-            "- Computes **RSI, MACD, moving averages (7/21/50d), volatility**\n"
-            "- LSTM trend classification (up / down / neutral) via PyTorch\n"
-            "- Natural language queries via **Groq LLM** (llama3 / mixtral)"
-        )
-
-    with col_stack:
-        st.markdown("### Tech Stack")
-        st.markdown(
-            "| Layer | Tech |\n"
-            "|---|---|\n"
-            "| Data | yfinance |\n"
-            "| Storage | DuckDB |\n"
-            "| Charts | Plotly |\n"
-            "| UI | Streamlit |\n"
-            "| ML | PyTorch LSTM |\n"
-            "| LLM | Groq API |"
-        )
-
-    st.divider()
-
-    st.markdown("### Covered Assets")
-    stocks = [t for t in TICKERS if not t.endswith("-USD")]
-    crypto = [t for t in TICKERS if t.endswith("-USD")]
-
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown("**Stocks**")
-        for t in stocks:
-            st.markdown(f"- `{t}`")
-    with c2:
-        st.markdown("**Crypto**")
-        for t in crypto:
-            st.markdown(f"- `{t}`")
-
-    st.divider()
-
-    st.markdown("### Pipeline Architecture")
-    st.code(
-        "yfinance  →  Bronze (raw OHLCV)\n"
-        "          →  Silver (RSI / MACD / MAs / volatility)\n"
-        "          →  Gold   (aggregated + ML-ready features)\n"
-        "                         ↓\n"
-        "            Streamlit Dashboard  +  LSTM  +  Groq Chat",
-        language=None,
-    )
-
-    st.caption("Built by Arthur Torres · Computer Engineering Portfolio Project")
+    st.markdown(build_landing_html(stats), unsafe_allow_html=True)
+    st.page_link("pages/1_Dashboard.py", label="→ Open Dashboard", icon="🚀")
 
 
 if __name__ == "__main__":

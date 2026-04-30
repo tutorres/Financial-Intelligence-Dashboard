@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 
 from dashboard.app import fmt_volume, load_prices, load_summary, rsi_signal
+from dashboard.app import _stat_card_html, build_landing_html
 
 
 def _make_conn():
@@ -143,3 +144,50 @@ def test_fmt_volume_thousands():
 
 def test_fmt_volume_none():
     assert fmt_volume(None) == "N/A"
+
+
+# --- _stat_card_html ---
+
+def test_stat_card_html_up_shows_green_and_up_arrow():
+    html = _stat_card_html("AAPL", 189.43, 1.24)
+    assert "#00ff88" in html
+    assert "▲" in html
+    assert "189.43" in html
+    assert "AAPL" in html
+
+
+def test_stat_card_html_down_shows_red_and_down_arrow():
+    html = _stat_card_html("MSFT", 415.20, -0.42)
+    assert "#ff4d4d" in html
+    assert "▼" in html
+    assert "415.20" in html
+
+
+def test_stat_card_html_none_price_shows_dash():
+    html = _stat_card_html("AAPL", None, None)
+    assert "—" in html
+
+
+# --- build_landing_html ---
+
+def test_build_landing_html_structure():
+    html = build_landing_html([])
+    assert "Financial" in html
+    assert "Intelligence" in html
+    assert "Dashboard" in html
+    assert "// data pipeline" in html
+    assert "// tech stack" in html
+    assert "// covered assets" in html
+
+
+def test_build_landing_html_shows_live_stats_when_provided():
+    stats = [{"ticker": "AAPL", "last_close": 189.43, "pct_change_1d": 1.24}]
+    html = build_landing_html(stats)
+    assert "189.43" in html
+    assert "AAPL" in html
+
+
+def test_build_landing_html_falls_back_to_placeholder_tickers():
+    html = build_landing_html([])
+    for ticker in ["AAPL", "MSFT", "NVDA", "BTC-USD"]:
+        assert ticker in html
