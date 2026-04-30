@@ -264,7 +264,7 @@ def build_landing_html(stats: list) -> str:
         <div style="font-size:13px;color:#94a3b8;margin-bottom:8px"><span style="color:#00ff88">▸</span> LSTM trend classifier <span style="background:#141414;border:1px solid #252525;padding:1px 8px;border-radius:2px;font-size:11px;color:#94a3b8;margin-left:4px">PyTorch</span></div>
         <div style="font-size:13px;color:#94a3b8;margin-bottom:8px"><span style="color:#00ff88">▸</span> Natural language queries <span style="background:#141414;border:1px solid #252525;padding:1px 8px;border-radius:2px;font-size:11px;color:#94a3b8;margin-left:4px">Groq LLM</span></div>
       </div>
-      <a href="/Dashboard" style="display:inline-flex;align-items:center;background:#00ff88;color:#0d0d0d;font-family:'Courier New',monospace;font-size:14px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-decoration:none">$ streamlit run &#9608;</a>
+      <a href="/Dashboard" target="_self" style="display:inline-flex;align-items:center;background:#00ff88;color:#0d0d0d;font-family:'Courier New',monospace;font-size:14px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-decoration:none">$ streamlit run &#9608;</a>
     </div>
     <div style="flex:1">
       <div style="font-size:10px;color:#94a3b8;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px">live market snapshot</div>
