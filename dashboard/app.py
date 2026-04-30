@@ -309,7 +309,6 @@ def main() -> None:
                 WHEN 'AAPL' THEN 1 WHEN 'MSFT' THEN 2
                 WHEN 'NVDA' THEN 3 WHEN 'BTC-USD' THEN 4 END
         """).fetchdf()
-        conn.close()
         stats = df.to_dict("records")
     except Exception:
         pass
