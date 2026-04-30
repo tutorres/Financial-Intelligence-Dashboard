@@ -4,7 +4,10 @@ def inject_global_css() -> str:
     return """\
 <style>
 .stApp,[data-testid="stAppViewContainer"]{background-color:#0d0d0d!important}
-.main .block-container{background-color:#0d0d0d!important;padding:0!important;max-width:100%!important}
+.main,.main .block-container,[data-testid="stMainBlockContainer"],[data-testid="block-container"]{background-color:#0d0d0d!important;padding:0!important;max-width:100%!important}
+section[data-testid="stMain"]>div:first-child{padding:0!important}
+[data-testid="stVerticalBlock"],[data-testid="stVerticalBlockBorderWrapper"]{gap:0!important;padding:0!important}
+[data-testid="stMarkdownContainer"]>div{width:100%!important}
 #MainMenu,footer,header{visibility:hidden}
 [data-testid="stSidebar"]{background-color:#141414!important;border-right:1px solid #252525!important}
 [data-testid="stSidebar"] *{font-family:'Courier New',monospace!important;color:#94a3b8!important}

@@ -244,7 +244,7 @@ def build_landing_html(stats: list) -> str:
         for t in ["AAPL", "MSFT", "GOOGL", "NVDA", "PETR4.SA", "VALE3.SA", "BTC-USD", "ETH-USD"]
     )
     return f"""
-<div style="font-family:'Courier New',monospace;background:#0d0d0d;color:#f8fafc">
+<div style="font-family:'Courier New',monospace;background:#0d0d0d;color:#f8fafc;width:100%;margin:0;padding:0;box-sizing:border-box">
   <nav style="border-bottom:1px solid #252525;padding:18px 64px;display:flex;align-items:center;justify-content:space-between">
     <span style="color:#00ff88;font-size:16px;font-weight:700;letter-spacing:3px">FID_</span>
     <div style="display:flex;gap:40px">
@@ -264,6 +264,7 @@ def build_landing_html(stats: list) -> str:
         <div style="font-size:13px;color:#94a3b8;margin-bottom:8px"><span style="color:#00ff88">▸</span> LSTM trend classifier <span style="background:#141414;border:1px solid #252525;padding:1px 8px;border-radius:2px;font-size:11px;color:#94a3b8;margin-left:4px">PyTorch</span></div>
         <div style="font-size:13px;color:#94a3b8;margin-bottom:8px"><span style="color:#00ff88">▸</span> Natural language queries <span style="background:#141414;border:1px solid #252525;padding:1px 8px;border-radius:2px;font-size:11px;color:#94a3b8;margin-left:4px">Groq LLM</span></div>
       </div>
+      <a href="/1_Dashboard" style="display:inline-flex;align-items:center;background:#00ff88;color:#0d0d0d;font-family:'Courier New',monospace;font-size:14px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-decoration:none">$ streamlit run &#9608;</a>
     </div>
     <div style="flex:1">
       <div style="font-size:10px;color:#94a3b8;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px">live market snapshot</div>
@@ -314,7 +315,6 @@ def main() -> None:
         pass
 
     st.markdown(build_landing_html(stats), unsafe_allow_html=True)
-    st.page_link("pages/1_Dashboard.py", label="→ Open Dashboard", icon="🚀")
 
 
 if __name__ == "__main__":
