@@ -164,14 +164,20 @@ def fig_macd(df: pd.DataFrame) -> go.Figure:
 
 
 def _stat_card_html(ticker: str, price, change) -> str:
-    is_up = change is None or change >= 0
-    border = "#00ff88" if is_up else "#ff4d4d"
-    fg = "#00ff88" if is_up else "#ff4d4d"
-    arrow = "▲" if is_up else "▼"
+    if change is None:
+        border, fg, arrow = "#252525", "#94a3b8", "—"
+    elif change >= 0:
+        border, fg, arrow = "#00ff88", "#00ff88", "▲"
+    else:
+        border, fg, arrow = "#ff4d4d", "#ff4d4d", "▼"
     price_str = f"${price:,.2f}" if price is not None else "—"
     change_str = f"{arrow} {abs(change):.2f}%" if change is not None else "—"
-    bars = [("40%","#ff4d4d"),("65%","#00ff88"),("50%","#00ff88"),
-            ("80%","#00ff88"),("70%","#ff4d4d"),("100%","#00ff88")]
+    if change is None:
+        bars = [("40%","#3a3a3a"),("65%","#3a3a3a"),("50%","#3a3a3a"),
+                ("80%","#3a3a3a"),("70%","#3a3a3a"),("100%","#3a3a3a")]
+    else:
+        bars = [("40%","#ff4d4d"),("65%","#00ff88"),("50%","#00ff88"),
+                ("80%","#00ff88"),("70%","#ff4d4d"),("100%","#00ff88")]
     bars_html = "".join(
         f'<div style="flex:1;height:{h};background:{c};border-radius:1px"></div>'
         for h, c in bars
@@ -295,7 +301,7 @@ def main() -> None:
 
     stats: list = []
     try:
-        conn = _get_conn()
+        conn = _get_db_connection()
         df = conn.execute("""
             SELECT ticker, last_close, pct_change_1d FROM gold.summary
             WHERE ticker IN ('AAPL','MSFT','NVDA','BTC-USD')

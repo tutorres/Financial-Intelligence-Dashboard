@@ -166,6 +166,8 @@ def test_stat_card_html_down_shows_red_and_down_arrow():
 def test_stat_card_html_none_price_shows_dash():
     html = _stat_card_html("AAPL", None, None)
     assert "—" in html
+    assert "▲" not in html
+    assert "#00ff88" not in html
 
 
 # --- build_landing_html ---
