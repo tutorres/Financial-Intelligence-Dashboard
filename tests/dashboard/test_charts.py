@@ -31,7 +31,10 @@ def _make_df(n: int = 30, all_nan_ma50: bool = False) -> pd.DataFrame:
 # --- fig_candlestick ---
 
 def test_fig_candlestick_returns_figure():
-    assert isinstance(fig_candlestick(_make_df()), go.Figure)
+    fig = fig_candlestick(_make_df())
+    assert isinstance(fig, go.Figure)
+    assert fig.layout.paper_bgcolor == "#0d0d0d"
+    assert fig.layout.plot_bgcolor == "#141414"
 
 
 def test_fig_candlestick_has_candlestick_trace():
@@ -52,7 +55,10 @@ def test_fig_candlestick_all_nan_ma50_skips_trace():
 # --- fig_volume ---
 
 def test_fig_volume_returns_figure():
-    assert isinstance(fig_volume(_make_df()), go.Figure)
+    fig = fig_volume(_make_df())
+    assert isinstance(fig, go.Figure)
+    assert fig.layout.paper_bgcolor == "#0d0d0d"
+    assert fig.layout.plot_bgcolor == "#141414"
 
 
 def test_fig_volume_green_when_close_above_open():
@@ -74,7 +80,10 @@ def test_fig_volume_red_when_close_below_open():
 # --- fig_rsi ---
 
 def test_fig_rsi_returns_figure():
-    assert isinstance(fig_rsi(_make_df()), go.Figure)
+    fig = fig_rsi(_make_df())
+    assert isinstance(fig, go.Figure)
+    assert fig.layout.paper_bgcolor == "#0d0d0d"
+    assert fig.layout.plot_bgcolor == "#141414"
 
 
 def test_fig_rsi_has_one_scatter_trace():
@@ -95,7 +104,10 @@ def test_fig_rsi_has_two_hlines():
 # --- fig_macd ---
 
 def test_fig_macd_returns_figure():
-    assert isinstance(fig_macd(_make_df()), go.Figure)
+    fig = fig_macd(_make_df())
+    assert isinstance(fig, go.Figure)
+    assert fig.layout.paper_bgcolor == "#0d0d0d"
+    assert fig.layout.plot_bgcolor == "#141414"
 
 
 def test_fig_macd_has_three_traces():

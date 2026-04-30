@@ -80,7 +80,15 @@ def fig_candlestick(df: pd.DataFrame) -> go.Figure:
             x=valid["date"], y=valid[col],
             name=name, line=dict(color=color, width=1.5),
         ))
-    fig.update_layout(xaxis_rangeslider_visible=False, height=600)
+    fig.update_layout(
+        xaxis_rangeslider_visible=False,
+        height=600,
+        paper_bgcolor="#0d0d0d",
+        plot_bgcolor="#141414",
+        font=dict(color="#f8fafc", family="'Courier New', monospace"),
+        xaxis=dict(gridcolor="#252525", linecolor="#252525"),
+        yaxis=dict(gridcolor="#252525", linecolor="#252525"),
+    )
     return fig
 
 
@@ -92,7 +100,15 @@ def fig_volume(df: pd.DataFrame) -> go.Figure:
     fig = go.Figure(go.Bar(
         x=df["date"], y=df["volume"], marker_color=colors, name="Volume",
     ))
-    fig.update_layout(height=350, showlegend=False)
+    fig.update_layout(
+        height=350,
+        showlegend=False,
+        paper_bgcolor="#0d0d0d",
+        plot_bgcolor="#141414",
+        font=dict(color="#f8fafc", family="'Courier New', monospace"),
+        xaxis=dict(gridcolor="#252525", linecolor="#252525"),
+        yaxis=dict(gridcolor="#252525", linecolor="#252525"),
+    )
     return fig
 
 
@@ -107,7 +123,15 @@ def fig_rsi(df: pd.DataFrame) -> go.Figure:
                   annotation_text="Overbought (70)")
     fig.add_hline(y=30, line_dash="dash", line_color="#22c55e",
                   annotation_text="Oversold (30)")
-    fig.update_layout(height=450, yaxis=dict(range=[0, 100]), title="RSI (14)")
+    fig.update_layout(
+        height=450,
+        yaxis=dict(range=[0, 100], gridcolor="#252525", linecolor="#252525"),
+        title=dict(text="RSI (14)", font=dict(color="#f8fafc")),
+        paper_bgcolor="#0d0d0d",
+        plot_bgcolor="#141414",
+        font=dict(color="#f8fafc", family="'Courier New', monospace"),
+        xaxis=dict(gridcolor="#252525", linecolor="#252525"),
+    )
     return fig
 
 
@@ -127,7 +151,15 @@ def fig_macd(df: pd.DataFrame) -> go.Figure:
         x=valid["date"], y=valid["macd_signal"],
         name="Signal", line=dict(color="#f59e0b"),
     ))
-    fig.update_layout(height=450, title="MACD (12/26/9)")
+    fig.update_layout(
+        height=450,
+        title=dict(text="MACD (12/26/9)", font=dict(color="#f8fafc")),
+        paper_bgcolor="#0d0d0d",
+        plot_bgcolor="#141414",
+        font=dict(color="#f8fafc", family="'Courier New', monospace"),
+        xaxis=dict(gridcolor="#252525", linecolor="#252525"),
+        yaxis=dict(gridcolor="#252525", linecolor="#252525"),
+    )
     return fig
 
 
