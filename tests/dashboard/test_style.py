@@ -38,3 +38,13 @@ def test_inject_dashboard_css_styles_tabs():
     css = inject_dashboard_css()
     assert "tab" in css
     assert "#00ff88" in css
+
+
+def test_inject_global_css_does_not_contain_metric_container():
+    css = inject_global_css()
+    assert "metric-container" not in css
+
+
+def test_inject_dashboard_css_does_not_contain_sidebar():
+    css = inject_dashboard_css()
+    assert "stSidebar" not in css
