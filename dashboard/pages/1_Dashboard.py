@@ -37,6 +37,9 @@ def main() -> None:
         page_icon="📊",
         layout="wide",
     )
+    from dashboard.style import inject_global_css, inject_dashboard_css
+    st.markdown(inject_global_css(), unsafe_allow_html=True)
+    st.markdown(inject_dashboard_css(), unsafe_allow_html=True)
     st.title("Financial Intelligence Dashboard")
 
     if not _data_ready():
