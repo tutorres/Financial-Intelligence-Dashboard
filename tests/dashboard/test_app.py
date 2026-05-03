@@ -156,9 +156,10 @@ def test_stat_card_html_up_shows_green_and_up_arrow():
     assert "AAPL" in html
 
 
-def test_stat_card_html_down_shows_red_and_down_arrow():
+def test_stat_card_html_down_shows_muted_and_down_arrow():
     html = _stat_card_html("MSFT", 415.20, -0.42)
-    assert "#ff4d4d" in html
+    assert "#8d8d8d" in html
+    assert "#ff4d4d" not in html
     assert "▼" in html
     assert "415.20" in html
 
