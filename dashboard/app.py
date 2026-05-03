@@ -85,7 +85,7 @@ def fig_candlestick(df: pd.DataFrame) -> go.Figure:
         height=600,
         paper_bgcolor="#0d0d0d",
         plot_bgcolor="#141414",
-        font=dict(color="#f8fafc", family="'Courier New', monospace"),
+        font=dict(color="#f8fafc", family="'Geist Mono', monospace"),
         xaxis=dict(gridcolor="#252525", linecolor="#252525"),
         yaxis=dict(gridcolor="#252525", linecolor="#252525"),
     )
@@ -105,7 +105,7 @@ def fig_volume(df: pd.DataFrame) -> go.Figure:
         showlegend=False,
         paper_bgcolor="#0d0d0d",
         plot_bgcolor="#141414",
-        font=dict(color="#f8fafc", family="'Courier New', monospace"),
+        font=dict(color="#f8fafc", family="'Geist Mono', monospace"),
         xaxis=dict(gridcolor="#252525", linecolor="#252525"),
         yaxis=dict(gridcolor="#252525", linecolor="#252525"),
     )
@@ -129,7 +129,7 @@ def fig_rsi(df: pd.DataFrame) -> go.Figure:
         title=dict(text="RSI (14)", font=dict(color="#f8fafc")),
         paper_bgcolor="#0d0d0d",
         plot_bgcolor="#141414",
-        font=dict(color="#f8fafc", family="'Courier New', monospace"),
+        font=dict(color="#f8fafc", family="'Geist Mono', monospace"),
         xaxis=dict(gridcolor="#252525", linecolor="#252525"),
     )
     return fig
@@ -156,7 +156,7 @@ def fig_macd(df: pd.DataFrame) -> go.Figure:
         title=dict(text="MACD (12/26/9)", font=dict(color="#f8fafc")),
         paper_bgcolor="#0d0d0d",
         plot_bgcolor="#141414",
-        font=dict(color="#f8fafc", family="'Courier New', monospace"),
+        font=dict(color="#f8fafc", family="'Geist Mono', monospace"),
         xaxis=dict(gridcolor="#252525", linecolor="#252525"),
         yaxis=dict(gridcolor="#252525", linecolor="#252525"),
     )
