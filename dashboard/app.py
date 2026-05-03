@@ -82,7 +82,7 @@ def fig_candlestick(df: pd.DataFrame) -> go.Figure:
         ))
     fig.update_layout(
         xaxis_rangeslider_visible=False,
-        height=600,
+        height=800,
         paper_bgcolor="#0d0d0d",
         plot_bgcolor="#141414",
         font=dict(color="#f8fafc", family="'Geist Mono', monospace"),
@@ -101,7 +101,7 @@ def fig_volume(df: pd.DataFrame) -> go.Figure:
         x=df["date"], y=df["volume"], marker_color=colors, name="Volume",
     ))
     fig.update_layout(
-        height=350,
+        height=480,
         showlegend=False,
         paper_bgcolor="#0d0d0d",
         plot_bgcolor="#141414",
@@ -124,7 +124,7 @@ def fig_rsi(df: pd.DataFrame) -> go.Figure:
     fig.add_hline(y=30, line_dash="dash", line_color="#22c55e",
                   annotation_text="Oversold (30)")
     fig.update_layout(
-        height=450,
+        height=600,
         yaxis=dict(range=[0, 100], gridcolor="#252525", linecolor="#252525"),
         title=dict(text="RSI (14)", font=dict(color="#f8fafc")),
         paper_bgcolor="#0d0d0d",
@@ -152,7 +152,7 @@ def fig_macd(df: pd.DataFrame) -> go.Figure:
         name="Signal", line=dict(color="#f59e0b"),
     ))
     fig.update_layout(
-        height=450,
+        height=600,
         title=dict(text="MACD (12/26/9)", font=dict(color="#f8fafc")),
         paper_bgcolor="#0d0d0d",
         plot_bgcolor="#141414",
