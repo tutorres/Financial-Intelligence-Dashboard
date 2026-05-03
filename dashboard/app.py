@@ -172,7 +172,7 @@ def _stat_card_html(ticker: str, price, change) -> str:
         border, fg, arrow = "#252525", "#8d8d8d", "▼"
     price_str = f"${price:,.2f}" if price is not None else "—"
     change_str = f"{arrow} {abs(change):.2f}%" if change is not None else "—"
-    bar_color = "#00ff88" if (change is not None and change >= 0) else "#252525"
+    bar_color = "#00ff88" if (change is not None and change >= 0) else "#8d8d8d"
     bars_html = "".join(
         f'<div style="flex:1;height:{h};background:{bar_color};border-radius:1px"></div>'
         for h in ["40%", "65%", "50%", "80%", "70%", "100%"]
