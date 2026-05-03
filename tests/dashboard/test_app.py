@@ -169,6 +169,7 @@ def test_stat_card_html_none_price_shows_dash():
     assert "—" in html
     assert "▲" not in html
     assert "#00ff88" not in html
+    assert "#ff4d4d" not in html
 
 
 # --- build_landing_html ---
