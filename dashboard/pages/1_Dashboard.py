@@ -58,7 +58,7 @@ def main() -> None:
 
     conn = _get_db_connection()
 
-    col1, col2 = st.columns([1, 3])
+    _, col1, col2, _ = st.columns([2, 1, 2, 2])
     with col1:
         ticker = st.selectbox("Ticker", TICKERS)
     with col2:
