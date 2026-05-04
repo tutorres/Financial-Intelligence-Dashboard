@@ -40,7 +40,16 @@ def main() -> None:
     from dashboard.style import inject_global_css, inject_dashboard_css
     st.markdown(inject_global_css(), unsafe_allow_html=True)
     st.markdown(inject_dashboard_css(), unsafe_allow_html=True)
-    st.title("Financial Intelligence Dashboard")
+    st.markdown("""
+<div style="border-bottom:1px solid #252525;padding:18px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
+  <div style="display:flex;align-items:center;gap:24px">
+    <a href="/" target="_self" style="color:#00ff88;font-size:15px;font-weight:700;letter-spacing:3px;text-decoration:none;font-family:'Geist Mono',monospace">FID_</a>
+    <span style="color:#252525;font-size:20px;line-height:1">|</span>
+    <span style="color:#8d8d8d;font-size:11px;font-family:'Geist Mono',monospace;letter-spacing:2px;text-transform:uppercase">Dashboard</span>
+  </div>
+  <a href="/" target="_self" style="color:#8d8d8d;font-size:11px;font-family:'Geist Mono',monospace;text-decoration:none;letter-spacing:1px">← Home</a>
+</div>
+""", unsafe_allow_html=True)
 
     if not _data_ready():
         with st.spinner("Fetching market data for the first time — this takes ~30 seconds..."):

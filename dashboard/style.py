@@ -21,6 +21,7 @@ body,p,span{font-family:'Geist',sans-serif!important}
 def inject_dashboard_css() -> str:
     return """\
 <style>
+.main .block-container,[data-testid="stMainBlockContainer"],[data-testid="block-container"]{padding:0 3rem 3rem!important}
 [data-testid="metric-container"]{background-color:#141414!important;border:1px solid #252525!important;border-radius:6px!important;padding:1rem!important;box-shadow:0 1px 4px rgba(0,0,0,.35)!important}
 [data-testid="stMetricLabel"]{color:#8d8d8d!important;font-size:10px!important;letter-spacing:1.5px!important;text-transform:uppercase!important;font-family:'Geist Mono',monospace!important}
 [data-testid="stMetricValue"]{color:#fcfcfc!important;font-size:24px!important;font-weight:700!important;font-family:'Geist',sans-serif!important}
