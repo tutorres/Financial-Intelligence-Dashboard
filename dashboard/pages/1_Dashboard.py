@@ -81,7 +81,7 @@ def main() -> None:
         st.stop()
 
     st.markdown(
-        '<a href="YOUR_ARTICLE_URL" target="_blank" style="'
+        '<a href="https://torres-dev-data.vercel.app/articles/financial-metrics-rsi-macd" target="_blank" style="'
         'font-family:\'Geist Mono\',monospace;font-size:11px;color:#8d8d8d;'
         'text-decoration:none;letter-spacing:1px;'
         'border:1px solid #252525;padding:6px 14px;border-radius:4px;'
