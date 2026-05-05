@@ -143,25 +143,26 @@ def main() -> None:
         if df.empty:
             st.info("No data available for this period.")
         else:
-            col_rsi, col_macd = st.columns(2)
-            with col_rsi:
-                st.markdown("#### RSI — Relative Strength Index (14 days)")
-                st.caption(
-                    "Measures how overbought or oversold an asset is, on a scale from 0 to 100. "
-                    "**Above 70**: overbought — a pullback is possible. "
-                    "**Below 30**: oversold — a bounce is possible. "
-                    "Works best combined with price action and volume."
-                )
-                st.plotly_chart(fig_rsi(df), use_container_width=True)
-            with col_macd:
-                st.markdown("#### MACD — Moving Average Convergence/Divergence (12 / 26 / 9)")
-                st.caption(
-                    "The **MACD line** (indigo) is the gap between the 12-day and 26-day EMAs. "
-                    "The **Signal line** (amber) smooths it over 9 days. "
-                    "Green histogram bars = bullish momentum; red = bearish. "
-                    "A MACD crossover above Signal is a classic buy signal."
-                )
-                st.plotly_chart(fig_macd(df), use_container_width=True)
+            st.markdown("#### RSI — Relative Strength Index (14 days)")
+            st.caption(
+                "Measures how overbought or oversold an asset is, on a scale from 0 to 100. "
+                "**Above 70**: the asset may be overbought — momentum is strong but a pullback is possible. "
+                "**Below 30**: the asset may be oversold — it has fallen fast and a bounce is possible. "
+                "**Between 30 and 70**: neutral territory. "
+                "RSI alone isn't a buy/sell signal — it works best combined with price action and volume."
+            )
+            st.plotly_chart(fig_rsi(df), use_container_width=True)
+
+            st.markdown("#### MACD — Moving Average Convergence/Divergence (12 / 26 / 9)")
+            st.caption(
+                "Shows the relationship between two exponential moving averages (12-day and 26-day). "
+                "The **MACD line** (indigo) is the difference between them. "
+                "The **Signal line** (amber) is a 9-day smoothing of the MACD. "
+                "The **histogram** shows the gap between the two: "
+                "green bars mean MACD is above Signal (bullish momentum), red bars mean it's below (bearish). "
+                "A **crossover** — MACD crossing above the Signal line — is a classic buy signal; crossing below is a sell signal."
+            )
+            st.plotly_chart(fig_macd(df), use_container_width=True)
 
 
 main()
