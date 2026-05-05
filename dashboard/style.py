@@ -4,6 +4,7 @@ def inject_global_css() -> str:
     return """\
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap');
+:root{color-scheme:dark}
 .stApp,[data-testid="stAppViewContainer"]{background-color:#0d0d0d!important}
 .main,.main .block-container,[data-testid="stMainBlockContainer"],[data-testid="block-container"]{background-color:#0d0d0d!important;padding:0!important;max-width:100%!important}
 section[data-testid="stMain"]>div:first-child{padding:0!important}
