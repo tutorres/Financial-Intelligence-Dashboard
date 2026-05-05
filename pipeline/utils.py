@@ -15,7 +15,7 @@ def get_connection(path: str | None = None) -> duckdb.DuckDBPyConnection:
 
 
 def setup_schemas(conn: duckdb.DuckDBPyConnection) -> None:
-    for schema in ("bronze", "silver", "gold"):
+    for schema in ("bronze", "silver", "gold", "features"):
         conn.execute(f"CREATE SCHEMA IF NOT EXISTS {schema}")
 
 

@@ -28,6 +28,7 @@ def test_setup_schemas_creates_all_three():
     assert "bronze" in schemas
     assert "silver" in schemas
     assert "gold" in schemas
+    assert "features" in schemas
     conn.close()
 
 
