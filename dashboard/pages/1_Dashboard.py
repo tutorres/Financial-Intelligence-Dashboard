@@ -41,7 +41,7 @@ def main() -> None:
     st.markdown(inject_global_css(), unsafe_allow_html=True)
     st.markdown(inject_dashboard_css(), unsafe_allow_html=True)
     st.markdown("""
-<div style="border-bottom:1px solid #252525;padding:18px 6rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
+<div style="border-bottom:1px solid #252525;padding:18px 6rem;margin:0 -6rem 2rem -6rem;display:flex;align-items:center;justify-content:space-between">
   <div style="display:flex;align-items:center;gap:24px">
     <a href="/" target="_self" style="color:#00ff88;font-size:15px;font-weight:700;letter-spacing:3px;text-decoration:none;font-family:'Geist Mono',monospace">FID_</a>
     <span style="color:#252525;font-size:20px;line-height:1">|</span>
