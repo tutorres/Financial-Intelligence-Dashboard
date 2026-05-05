@@ -80,6 +80,16 @@ def main() -> None:
         st.warning("No data found. Run `python pipeline/run.py` first.")
         st.stop()
 
+    st.markdown(
+        '<a href="YOUR_ARTICLE_URL" target="_blank" style="'
+        'font-family:\'Geist Mono\',monospace;font-size:11px;color:#8d8d8d;'
+        'text-decoration:none;letter-spacing:1px;'
+        'border:1px solid #252525;padding:6px 14px;border-radius:4px;'
+        'display:inline-block;margin-bottom:1.2rem;'
+        'transition:color .15s,border-color .15s">'
+        '→ how these indicators work</a>',
+        unsafe_allow_html=True,
+    )
     tab1, tab2, tab3 = st.tabs(["Overview", "Price & Volume", "Technical Indicators"])
 
     with tab1:
