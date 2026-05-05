@@ -84,7 +84,7 @@ def main() -> None:
         '<a href="https://torres-dev-data.vercel.app/articles/financial-metrics-rsi-macd" target="_blank" style="'
         'font-family:\'Geist Mono\',monospace;font-size:11px;color:#8d8d8d;'
         'text-decoration:none;letter-spacing:1px;'
-        'border:1px solid #252525;padding:6px 14px;border-radius:4px;'
+        'border:1px solid #252525;padding:10px 24px;border-radius:4px;'
         'display:inline-block;margin-bottom:1.2rem;'
         'transition:color .15s,border-color .15s">'
         '→ how these indicators work</a>',
