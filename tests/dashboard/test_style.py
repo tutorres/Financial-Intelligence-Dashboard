@@ -14,12 +14,12 @@ def test_inject_global_css_is_style_tag():
 
 def test_inject_global_css_contains_dark_bg():
     css = inject_global_css()
-    assert "#0d0d0d" in css
+    assert "#0a0a0a" in css
 
 
-def test_inject_global_css_contains_green_accent():
+def test_inject_global_css_contains_primary_text():
     css = inject_global_css()
-    assert "#00ff88" in css
+    assert "#e5e5e5" in css
 
 
 def test_inject_dashboard_css_is_style_tag():
@@ -31,13 +31,13 @@ def test_inject_dashboard_css_is_style_tag():
 def test_inject_dashboard_css_styles_metric_container():
     css = inject_dashboard_css()
     assert "metric-container" in css
-    assert "#141414" in css
+    assert "#111111" in css
 
 
 def test_inject_dashboard_css_styles_tabs():
     css = inject_dashboard_css()
     assert "tab" in css
-    assert "#00ff88" in css
+    assert "#e5e5e5" in css
 
 
 def test_inject_global_css_does_not_contain_metric_container():

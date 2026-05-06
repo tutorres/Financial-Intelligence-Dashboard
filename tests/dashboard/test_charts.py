@@ -33,8 +33,8 @@ def _make_df(n: int = 30, all_nan_ma50: bool = False) -> pd.DataFrame:
 def test_fig_candlestick_returns_figure():
     fig = fig_candlestick(_make_df())
     assert isinstance(fig, go.Figure)
-    assert fig.layout.paper_bgcolor == "#0d0d0d"
-    assert fig.layout.plot_bgcolor == "#141414"
+    assert fig.layout.paper_bgcolor == "rgba(0,0,0,0)"
+    assert fig.layout.plot_bgcolor == "#0a0a0a"
 
 
 def test_fig_candlestick_has_candlestick_trace():
@@ -57,8 +57,8 @@ def test_fig_candlestick_all_nan_ma50_skips_trace():
 def test_fig_volume_returns_figure():
     fig = fig_volume(_make_df())
     assert isinstance(fig, go.Figure)
-    assert fig.layout.paper_bgcolor == "#0d0d0d"
-    assert fig.layout.plot_bgcolor == "#141414"
+    assert fig.layout.paper_bgcolor == "rgba(0,0,0,0)"
+    assert fig.layout.plot_bgcolor == "#0a0a0a"
 
 
 def test_fig_volume_green_when_close_above_open():
@@ -66,7 +66,7 @@ def test_fig_volume_green_when_close_above_open():
     df["close"] = df["open"] + 1  # close always > open
     fig = fig_volume(df)
     bar = fig.data[0]
-    assert all(c == "#22c55e" for c in bar.marker.color)
+    assert all(c == "#4a9463" for c in bar.marker.color)
 
 
 def test_fig_volume_red_when_close_below_open():
@@ -74,7 +74,7 @@ def test_fig_volume_red_when_close_below_open():
     df["close"] = df["open"] - 1  # close always < open
     fig = fig_volume(df)
     bar = fig.data[0]
-    assert all(c == "#ef4444" for c in bar.marker.color)
+    assert all(c == "#8b3a3a" for c in bar.marker.color)
 
 
 # --- fig_rsi ---
@@ -82,8 +82,8 @@ def test_fig_volume_red_when_close_below_open():
 def test_fig_rsi_returns_figure():
     fig = fig_rsi(_make_df())
     assert isinstance(fig, go.Figure)
-    assert fig.layout.paper_bgcolor == "#0d0d0d"
-    assert fig.layout.plot_bgcolor == "#141414"
+    assert fig.layout.paper_bgcolor == "rgba(0,0,0,0)"
+    assert fig.layout.plot_bgcolor == "#0a0a0a"
 
 
 def test_fig_rsi_has_one_scatter_trace():
@@ -106,8 +106,8 @@ def test_fig_rsi_has_two_hlines():
 def test_fig_macd_returns_figure():
     fig = fig_macd(_make_df())
     assert isinstance(fig, go.Figure)
-    assert fig.layout.paper_bgcolor == "#0d0d0d"
-    assert fig.layout.plot_bgcolor == "#141414"
+    assert fig.layout.paper_bgcolor == "rgba(0,0,0,0)"
+    assert fig.layout.plot_bgcolor == "#0a0a0a"
 
 
 def test_fig_macd_has_three_traces():
