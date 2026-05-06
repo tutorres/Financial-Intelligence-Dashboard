@@ -41,13 +41,13 @@ def main() -> None:
     st.markdown(inject_global_css(), unsafe_allow_html=True)
     st.markdown(inject_dashboard_css(), unsafe_allow_html=True)
     st.markdown("""
-<div style="border-bottom:1px solid #252525;padding:18px 6rem;margin:0 -6rem 2rem -6rem;display:flex;align-items:center;justify-content:space-between">
+<div style="border-bottom:1px solid #1a1a1a;padding:18px 6rem;margin:0 -6rem 2rem -6rem;display:flex;align-items:center;justify-content:space-between">
   <div style="display:flex;align-items:center;gap:24px">
-    <a href="/" target="_self" style="color:#00ff88;font-size:15px;font-weight:700;letter-spacing:3px;text-decoration:none;font-family:'Geist Mono',monospace">FID_</a>
-    <span style="color:#252525;font-size:20px;line-height:1">|</span>
-    <span style="color:#8d8d8d;font-size:11px;font-family:'Geist Mono',monospace;letter-spacing:2px;text-transform:uppercase">Dashboard</span>
+    <a href="/" target="_self" style="color:#e5e5e5;font-size:15px;font-weight:700;letter-spacing:3px;text-decoration:none;font-family:'Geist Mono',monospace">FID_</a>
+    <span style="color:#1a1a1a;font-size:20px;line-height:1">|</span>
+    <span style="color:#525252;font-size:11px;font-family:'Geist Mono',monospace;letter-spacing:2px;text-transform:uppercase">Dashboard</span>
   </div>
-  <a href="/" target="_self" style="color:#8d8d8d;font-size:11px;font-family:'Geist Mono',monospace;text-decoration:none;letter-spacing:1px">← Home</a>
+  <a href="/" target="_self" style="color:#737373;font-size:11px;font-family:'Geist Mono',monospace;text-decoration:none;letter-spacing:1px">← Home</a>
 </div>
 """, unsafe_allow_html=True)
 
@@ -82,11 +82,11 @@ def main() -> None:
 
     st.markdown(
         '<a href="https://torres-dev-data.vercel.app/articles/financial-metrics-rsi-macd" target="_blank" style="'
-        'font-family:\'Geist Mono\',monospace;font-size:11px;color:#8d8d8d;'
+        'font-family:\'Geist Mono\',monospace;font-size:11px;color:#737373;'
         'text-decoration:none;letter-spacing:1px;'
-        'border:1px solid #252525;padding:10px 24px;border-radius:4px;'
+        'border:1px solid #1a1a1a;padding:10px 24px;border-radius:4px;'
         'display:inline-block;margin-bottom:1.2rem;'
-        'transition:color .15s,border-color .15s">'
+        'transition:opacity .15s">'
         '→ how these indicators work</a>',
         unsafe_allow_html=True,
     )
