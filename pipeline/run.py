@@ -1,3 +1,4 @@
+from ml.predict import predict
 from pipeline.aggregate import aggregate
 from pipeline.ingest import ingest
 from pipeline.ml_features import ml_features
@@ -15,6 +16,7 @@ def run() -> None:
         transform(conn=conn)
         aggregate(conn=conn)
         ml_features(conn=conn)
+        predict(conn=conn)
         logger.info("Pipeline complete")
     except Exception as exc:
         logger.error("Pipeline failed: %s", exc)
