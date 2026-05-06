@@ -23,9 +23,8 @@ def _make_conn():
             current_rsi    DOUBLE
         )
     """)
-    conn.execute("CREATE SCHEMA silver")
     conn.execute("""
-        CREATE TABLE silver.prices (
+        CREATE TABLE gold.prices (
             ticker        VARCHAR NOT NULL,
             date          DATE NOT NULL,
             open          DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE,
@@ -57,7 +56,7 @@ def conn_with_data():
     for i in range(60):
         d = (today - timedelta(days=i)).isoformat()
         c.execute("""
-            INSERT INTO silver.prices VALUES
+            INSERT INTO gold.prices VALUES
             ('AAPL', ?, 100.0, 102.0, 99.0, 101.0, 1000000,
              0.01, 100.5, 100.3, 100.1, 55.0, 0.5, 0.4, 0.1, 0.015)
         """, [d])

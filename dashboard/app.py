@@ -35,7 +35,7 @@ def load_prices(conn, ticker: str, days: int) -> pd.DataFrame:
         SELECT ticker, date, open, high, low, close, volume,
                daily_return, ma_7, ma_21, ma_50, rsi_14,
                macd, macd_signal, macd_hist, volatility_21
-        FROM silver.prices
+        FROM gold.prices
         WHERE ticker = ? AND date >= ?
         ORDER BY date
     """, [ticker, cutoff]).df()
