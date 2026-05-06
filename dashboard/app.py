@@ -51,6 +51,38 @@ def rsi_signal(rsi) -> str:
     return "Neutral"
 
 
+def load_prediction(conn, ticker: str) -> dict | None:
+    try:
+        row = conn.execute(
+            "SELECT signal, confidence, p_down, p_neutral, p_up, predicted_at "
+            "FROM gold.predictions WHERE ticker = ?",
+            [ticker],
+        ).fetchdf()
+    except Exception:
+        return None
+    if row.empty:
+        return None
+    return row.iloc[0].to_dict()
+
+
+def fig_prediction_probs(pred: dict) -> go.Figure:
+    fig = go.Figure(go.Bar(
+        x=[pred["p_down"], pred["p_neutral"], pred["p_up"]],
+        y=["DOWN", "NEUTRAL", "UP"],
+        orientation="h",
+        marker_color=["#525252", "#737373", "#e5e5e5"],
+        text=[f"{pred['p_down']*100:.1f}%", f"{pred['p_neutral']*100:.1f}%", f"{pred['p_up']*100:.1f}%"],
+        textposition="outside",
+        textfont=dict(color="#737373", size=12),
+    ))
+    fig.update_layout(
+        height=200,
+        xaxis=dict(range=[0, 1.2], tickformat=".0%", showgrid=False),
+        yaxis=dict(showgrid=False),
+    )
+    return apply_theme(fig)
+
+
 def fmt_volume(v) -> str:
     if pd.isna(v):
         return "N/A"

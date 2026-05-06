@@ -10,9 +10,11 @@ from dashboard.app import (
     _get_db_connection,
     fig_candlestick,
     fig_macd,
+    fig_prediction_probs,
     fig_rsi,
     fig_volume,
     fmt_volume,
+    load_prediction,
     load_prices,
     load_summary,
     rsi_signal,
@@ -93,7 +95,7 @@ def main() -> None:
         '→ how these indicators work</a>',
         unsafe_allow_html=True,
     )
-    tab1, tab2, tab3 = st.tabs(["Overview", "Price & Volume", "Technical Indicators"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Price & Volume", "Technical Indicators", "Predictions"])
 
     with tab1:
         if summary is None:
@@ -176,6 +178,24 @@ def main() -> None:
                 "A **crossover** — MACD crossing above the Signal line — is a classic buy signal; crossing below is a sell signal."
             )
             st.plotly_chart(fig_macd(df), width="stretch")
+
+    with tab4:
+        pred = load_prediction(conn, ticker)
+        if pred is None:
+            st.markdown(
+                '<p style="color:#525252;font-family:\'Geist Mono\',monospace;font-size:12px;'
+                'line-height:1.8;margin-top:1rem">'
+                'No prediction available.<br>'
+                'Train the model locally, then redeploy:<br>'
+                '<code style="color:#737373">python ml/train.py</code></p>',
+                unsafe_allow_html=True,
+            )
+        else:
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Signal", pred["signal"])
+            c2.metric("Confidence", f"{pred['confidence'] * 100:.1f}%")
+            c3.metric("Predicted", str(pred["predicted_at"])[:16])
+            st.plotly_chart(fig_prediction_probs(pred), width="stretch")
 
 
 main()
