@@ -24,7 +24,9 @@ from pipeline.utils import TICKERS, get_connection as _get_raw_conn
 def _data_ready() -> bool:
     conn = _get_raw_conn()
     try:
-        return conn.execute("SELECT COUNT(*) FROM gold.summary").fetchone()[0] > 0
+        summary_ok = conn.execute("SELECT COUNT(*) FROM gold.summary").fetchone()[0] > 0
+        prices_ok = conn.execute("SELECT COUNT(*) FROM gold.prices").fetchone()[0] > 0
+        return summary_ok and prices_ok
     except Exception:
         return False
     finally:
@@ -52,6 +54,7 @@ def main() -> None:
 """, unsafe_allow_html=True)
 
     if not _data_ready():
+        st.cache_resource.clear()  # close any cached DuckDB connection before pipeline writes
         with st.spinner("Fetching market data for the first time — this takes ~30 seconds..."):
             _run_pipeline()
         st.rerun()
