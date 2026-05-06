@@ -140,7 +140,7 @@ def main() -> None:
                 "**MA50** (indigo) reflects the long-term direction. "
                 "When a shorter MA crosses above a longer one, it's a bullish signal — and vice versa."
             )
-            st.plotly_chart(fig_candlestick(df), use_container_width=True)
+            st.plotly_chart(fig_candlestick(df), width="stretch")
 
             st.markdown("#### Volume")
             st.caption(
@@ -150,7 +150,7 @@ def main() -> None:
                 "Low volume moves are less reliable — they can reverse easily. "
                 "Color matches the candle above: green = up day, red = down day."
             )
-            st.plotly_chart(fig_volume(df), use_container_width=True)
+            st.plotly_chart(fig_volume(df), width="stretch")
 
     with tab3:
         if df.empty:
@@ -164,7 +164,7 @@ def main() -> None:
                 "**Between 30 and 70**: neutral territory. "
                 "RSI alone isn't a buy/sell signal — it works best combined with price action and volume."
             )
-            st.plotly_chart(fig_rsi(df), use_container_width=True)
+            st.plotly_chart(fig_rsi(df), width="stretch")
 
             st.markdown("#### MACD — Moving Average Convergence/Divergence (12 / 26 / 9)")
             st.caption(
@@ -175,7 +175,7 @@ def main() -> None:
                 "green bars mean MACD is above Signal (bullish momentum), red bars mean it's below (bearish). "
                 "A **crossover** — MACD crossing above the Signal line — is a classic buy signal; crossing below is a sell signal."
             )
-            st.plotly_chart(fig_macd(df), use_container_width=True)
+            st.plotly_chart(fig_macd(df), width="stretch")
 
 
 main()
