@@ -4,8 +4,9 @@ logger = get_logger(__name__)
 
 
 def _create_table(conn) -> None:
+    conn.execute("DROP TABLE IF EXISTS silver.prices")
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS silver.prices (
+        CREATE TABLE silver.prices (
             ticker  VARCHAR NOT NULL,
             date    DATE NOT NULL,
             open    DOUBLE,
