@@ -16,7 +16,7 @@ def test_get_connection_accepts_memory():
     conn.close()
 
 
-def test_setup_schemas_creates_all_three():
+def test_setup_schemas_creates_all_four():
     conn = get_connection(":memory:")
     setup_schemas(conn)
     schemas = [

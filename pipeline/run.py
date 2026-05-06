@@ -1,5 +1,6 @@
 from pipeline.aggregate import aggregate
 from pipeline.ingest import ingest
+from pipeline.ml_features import ml_features
 from pipeline.transform import transform
 from pipeline.utils import get_connection, get_logger
 
@@ -13,6 +14,7 @@ def run() -> None:
         ingest(conn=conn)
         transform(conn=conn)
         aggregate(conn=conn)
+        ml_features(conn=conn)
         logger.info("Pipeline complete")
     except Exception as exc:
         logger.error("Pipeline failed: %s", exc)

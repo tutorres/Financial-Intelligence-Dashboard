@@ -232,8 +232,8 @@ def build_landing_html(stats: list) -> str:
     )
     pipeline = arrow.join([
         _pipeline_step_html("Layer 01", "Bronze", "Raw OHLCV ingestion via yfinance. Stored with ingestion timestamp. No transformations."),
-        _pipeline_step_html("Layer 02", "Silver", "RSI, MACD, moving averages (7/21/50d), volatility, deduplication, null handling."),
-        _pipeline_step_html("Layer 03", "Gold", "Per-ticker aggregated stats. Normalized feature sets ready for LSTM input."),
+        _pipeline_step_html("Layer 02", "Silver", "Null handling and deduplication. OHLCV-only output."),
+        _pipeline_step_html("Layer 03", "Gold", "RSI, MACD, moving averages (7/21/50d), volatility. Per-ticker aggregated stats ready for LSTM input."),
         _pipeline_step_html("Output", "Dashboard", "Streamlit + Plotly charts. LSTM predictions. Groq natural language interface.", highlight=True),
     ])
     tech = "".join([
