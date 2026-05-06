@@ -10,9 +10,6 @@ def _make_silver_df(ticker: str = "AAPL", n: int = 60) -> pd.DataFrame:
     rng = np.random.default_rng(42)
     dates = pd.bdate_range("2023-01-01", periods=n).date
     close = 100 + np.cumsum(rng.standard_normal(n) * 2)
-    daily_return = pd.Series(close).pct_change().values
-    ma_7 = pd.Series(close).rolling(7).mean().values
-    ma_21 = pd.Series(close).rolling(21).mean().values
     return pd.DataFrame({
         "ticker": ticker,
         "date": dates,
@@ -20,38 +17,20 @@ def _make_silver_df(ticker: str = "AAPL", n: int = 60) -> pd.DataFrame:
         "high": close * 1.01,
         "low": close * 0.98,
         "close": close,
-        "volume": rng.integers(1_000_000, 10_000_000, n).astype(float),
-        "daily_return": daily_return,
-        "ma_7": ma_7,
-        "ma_21": ma_21,
-        "ma_50": pd.Series(close).rolling(50).mean().values,
-        "rsi_14": rng.uniform(20, 80, n),
-        "macd": rng.standard_normal(n) * 0.5,
-        "macd_signal": rng.standard_normal(n) * 0.5,
-        "macd_hist": rng.standard_normal(n) * 0.1,
-        "volatility_21": rng.uniform(0.005, 0.03, n),
+        "volume": rng.integers(1_000_000, 10_000_000, n),
     })
 
 
 def _insert_silver(conn, df: pd.DataFrame) -> None:
     conn.execute("""
         CREATE TABLE IF NOT EXISTS silver.prices (
-            ticker        VARCHAR NOT NULL,
-            date          DATE NOT NULL,
-            open          DOUBLE,
-            high          DOUBLE,
-            low           DOUBLE,
-            close         DOUBLE,
-            volume        DOUBLE,
-            daily_return  DOUBLE,
-            ma_7          DOUBLE,
-            ma_21         DOUBLE,
-            ma_50         DOUBLE,
-            rsi_14        DOUBLE,
-            macd          DOUBLE,
-            macd_signal   DOUBLE,
-            macd_hist     DOUBLE,
-            volatility_21 DOUBLE,
+            ticker  VARCHAR NOT NULL,
+            date    DATE NOT NULL,
+            open    DOUBLE,
+            high    DOUBLE,
+            low     DOUBLE,
+            close   DOUBLE,
+            volume  BIGINT,
             PRIMARY KEY (ticker, date)
         )
     """)
@@ -66,36 +45,37 @@ def conn():
     c.close()
 
 
-def test_aggregate_creates_features(conn):
+def test_aggregate_creates_gold_prices(conn):
     _insert_silver(conn, _make_silver_df("AAPL", 60))
     aggregate(conn=conn)
-    count = conn.execute("SELECT COUNT(*) FROM gold.features").fetchone()[0]
-    assert count > 0
+    count = conn.execute("SELECT COUNT(*) FROM gold.prices").fetchone()[0]
+    assert count == 60
 
 
-def test_features_close_norm_bounded(conn):
-    _insert_silver(conn, _make_silver_df("AAPL", 60))
-    aggregate(conn=conn)
-    rows = conn.execute(
-        "SELECT close_norm FROM gold.features WHERE close_norm IS NOT NULL"
-    ).df()
-    assert (rows["close_norm"] >= 0).all()
-    assert (rows["close_norm"] <= 1).all()
-
-
-def test_features_volume_norm_bounded(conn):
+def test_gold_prices_rsi_bounded(conn):
     _insert_silver(conn, _make_silver_df("AAPL", 60))
     aggregate(conn=conn)
     rows = conn.execute(
-        "SELECT volume_norm FROM gold.features WHERE volume_norm IS NOT NULL"
+        "SELECT rsi_14 FROM gold.prices WHERE ticker='AAPL' AND rsi_14 IS NOT NULL"
     ).df()
-    assert (rows["volume_norm"] >= 0).all()
-    assert (rows["volume_norm"] <= 1).all()
+    assert len(rows) > 0
+    assert (rows["rsi_14"] >= 0).all()
+    assert (rows["rsi_14"] <= 100).all()
+
+
+def test_gold_prices_ma7(conn):
+    df = _make_silver_df("AAPL", 60)
+    _insert_silver(conn, df)
+    aggregate(conn=conn)
+    rows = conn.execute(
+        "SELECT ma_7 FROM gold.prices WHERE ticker='AAPL' ORDER BY date"
+    ).df()
+    expected = df["close"].iloc[:7].mean()
+    assert abs(rows["ma_7"].iloc[6] - expected) < 1e-9
 
 
 def test_aggregate_creates_summary_one_row_per_ticker(conn):
-    silver = pd.concat([_make_silver_df("AAPL", 60), _make_silver_df("MSFT", 60)])
-    _insert_silver(conn, silver)
+    _insert_silver(conn, pd.concat([_make_silver_df("AAPL", 60), _make_silver_df("MSFT", 60)]))
     aggregate(conn=conn)
     count = conn.execute("SELECT COUNT(*) FROM gold.summary").fetchone()[0]
     assert count == 2

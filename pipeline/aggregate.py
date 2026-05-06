@@ -5,27 +5,35 @@ from pipeline.utils import get_connection, get_logger, setup_schemas
 logger = get_logger(__name__)
 
 
-def _normalize(series: pd.Series) -> pd.Series:
-    series = series.astype(float)
-    mn, mx = series.min(), series.max()
-    if mx == mn:
-        return pd.Series(0.0, index=series.index)
-    return (series - mn) / (mx - mn)
+def _rsi(close: pd.Series, period: int = 14) -> pd.Series:
+    delta = close.diff()
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+    avg_gain = gain.ewm(com=period - 1, min_periods=period).mean()
+    avg_loss = loss.ewm(com=period - 1, min_periods=period).mean()
+    rs = avg_gain / avg_loss.replace(0, float("nan"))
+    return 100 - (100 / (1 + rs))
 
 
-def _build_features(df: pd.DataFrame) -> pd.DataFrame:
-    out = df[["ticker", "date", "rsi_14", "daily_return"]].copy()
-    for col, norm_col in [
-        ("close", "close_norm"),
-        ("volume", "volume_norm"),
-        ("ma_7", "ma_7_norm"),
-        ("ma_21", "ma_21_norm"),
-    ]:
-        out[norm_col] = df.groupby("ticker")[col].transform(_normalize)
-    return out[[
-        "ticker", "date", "close_norm", "volume_norm",
-        "ma_7_norm", "ma_21_norm", "rsi_14", "daily_return",
-    ]].dropna()
+def _compute_indicators(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.sort_values("date").copy()
+    close = df["close"]
+    df["daily_return"] = close.pct_change()
+    df["ma_7"] = close.rolling(7).mean()
+    df["ma_21"] = close.rolling(21).mean()
+    df["ma_50"] = close.rolling(50).mean()
+    df["rsi_14"] = _rsi(close)
+    ema12 = close.ewm(span=12, adjust=False).mean()
+    ema26 = close.ewm(span=26, adjust=False).mean()
+    df["macd"] = ema12 - ema26
+    df["macd_signal"] = df["macd"].ewm(span=9, adjust=False).mean()
+    df["macd_hist"] = df["macd"] - df["macd_signal"]
+    df["volatility_21"] = df["daily_return"].rolling(21).std()
+    return df[[
+        "ticker", "date", "open", "high", "low", "close", "volume",
+        "daily_return", "ma_7", "ma_21", "ma_50", "rsi_14",
+        "macd", "macd_signal", "macd_hist", "volatility_21",
+    ]]
 
 
 def _pct_change(group: pd.DataFrame, n: int) -> float | None:
@@ -56,15 +64,23 @@ def _build_summary(df: pd.DataFrame) -> pd.DataFrame:
 
 def _create_tables(conn) -> None:
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS gold.features (
-            ticker       VARCHAR NOT NULL,
-            date         DATE NOT NULL,
-            close_norm   DOUBLE,
-            volume_norm  DOUBLE,
-            ma_7_norm    DOUBLE,
-            ma_21_norm   DOUBLE,
-            rsi_14       DOUBLE,
-            daily_return DOUBLE,
+        CREATE TABLE IF NOT EXISTS gold.prices (
+            ticker        VARCHAR NOT NULL,
+            date          DATE NOT NULL,
+            open          DOUBLE,
+            high          DOUBLE,
+            low           DOUBLE,
+            close         DOUBLE,
+            volume        BIGINT,
+            daily_return  DOUBLE,
+            ma_7          DOUBLE,
+            ma_21         DOUBLE,
+            ma_50         DOUBLE,
+            rsi_14        DOUBLE,
+            macd          DOUBLE,
+            macd_signal   DOUBLE,
+            macd_hist     DOUBLE,
+            volatility_21 DOUBLE,
             PRIMARY KEY (ticker, date)
         )
     """)
@@ -94,13 +110,18 @@ def aggregate(conn=None) -> None:
         if own_conn:
             conn.close()
         return
-    features_df = _build_features(silver)
-    summary_df = _build_summary(silver)
-    conn.execute("DELETE FROM gold.features")
+    results = []
+    for ticker in silver["ticker"].unique():
+        results.append(_compute_indicators(silver[silver["ticker"] == ticker]))
+    gold_df = pd.concat(results, ignore_index=True)
+    summary_df = _build_summary(gold_df)
+    conn.execute("DELETE FROM gold.prices")
     conn.execute("""
-        INSERT INTO gold.features
-        SELECT ticker, date, close_norm, volume_norm, ma_7_norm, ma_21_norm, rsi_14, daily_return
-        FROM features_df
+        INSERT INTO gold.prices
+        SELECT ticker, date, open, high, low, close, volume,
+               daily_return, ma_7, ma_21, ma_50, rsi_14,
+               macd, macd_signal, macd_hist, volatility_21
+        FROM gold_df
     """)
     conn.execute("DELETE FROM gold.summary")
     conn.execute("""
@@ -110,8 +131,8 @@ def aggregate(conn=None) -> None:
         FROM summary_df
     """)
     logger.info(
-        "Aggregated %d feature rows and %d summary rows into gold",
-        len(features_df),
+        "Aggregated %d price rows and %d summary rows into gold",
+        len(gold_df),
         len(summary_df),
     )
     if own_conn:
