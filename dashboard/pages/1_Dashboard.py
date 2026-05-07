@@ -21,6 +21,7 @@ from dashboard.app import (
 )
 from pipeline.run import run as _run_pipeline
 from pipeline.utils import TICKERS, get_connection as _get_raw_conn
+from chat.agent import ask as _ask, is_available as _chat_available
 
 
 def _data_ready() -> bool:
@@ -95,7 +96,7 @@ def main() -> None:
         '→ how these indicators work</a>',
         unsafe_allow_html=True,
     )
-    tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Price & Volume", "Technical Indicators", "Predictions"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Overview", "Price & Volume", "Technical Indicators", "Predictions", "Chat"])
 
     with tab1:
         if summary is None:
@@ -196,6 +197,32 @@ def main() -> None:
             c2.metric("Confidence", f"{pred['confidence'] * 100:.1f}%")
             c3.metric("Predicted", str(pred["predicted_at"])[:16])
             st.plotly_chart(fig_prediction_probs(pred), width="stretch")
+
+    with tab5:
+        if not _chat_available():
+            st.info("Set GROQ_API_KEY in your .env file to enable chat.")
+        else:
+            if "chat_messages" not in st.session_state:
+                st.session_state.chat_messages = {}
+            if ticker not in st.session_state.chat_messages:
+                st.session_state.chat_messages[ticker] = []
+            messages = st.session_state.chat_messages[ticker]
+
+            for msg in messages:
+                if msg.get("role") in ("user", "assistant") and msg.get("content"):
+                    with st.chat_message(msg["role"]):
+                        st.markdown(msg["content"])
+
+            if prompt := st.chat_input(f"Ask about {ticker}…"):
+                messages.append({"role": "user", "content": prompt})
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+                try:
+                    with st.chat_message("assistant"):
+                        full_response = st.write_stream(_ask(ticker, messages, conn))
+                    messages.append({"role": "assistant", "content": full_response})
+                except Exception as exc:
+                    st.error(f"Chat error: {exc}")
 
 
 main()
