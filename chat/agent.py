@@ -139,14 +139,17 @@ _TOOLS = [
 
 
 def _dispatch_tool(tool_call, conn) -> dict | list:
-    args = json.loads(tool_call.function.arguments)
+    try:
+        args = json.loads(tool_call.function.arguments)
+    except json.JSONDecodeError:
+        return {"error": "malformed tool arguments"}
     name = tool_call.function.name
     if name == "get_summary":
-        return _get_summary(conn, args["ticker"])
+        return _get_summary(conn, args.get("ticker", ""))
     if name == "get_recent_prices":
-        return _get_recent_prices(conn, args["ticker"], args.get("days", 30))
+        return _get_recent_prices(conn, args.get("ticker", ""), args.get("days", 30))
     if name == "get_prediction":
-        return _get_prediction(conn, args["ticker"])
+        return _get_prediction(conn, args.get("ticker", ""))
     return {"error": f"unknown tool: {name}"}
 
 
@@ -193,7 +196,11 @@ def ask(ticker: str, messages: list[dict], conn) -> Iterator[str]:
         messages=_build(messages),
         stream=True,
     )
+    yielded = False
     for chunk in stream:
         content = chunk.choices[0].delta.content
         if content:
             yield content
+            yielded = True
+    if not yielded:
+        yield ""
