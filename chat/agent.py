@@ -192,7 +192,7 @@ def ask(ticker: str, messages: list[dict], conn) -> Iterator[str]:
         })
 
     stream = _client.chat.completions.create(
-        model="llama3-8b-8192",
+        model="llama-3.1-8b-instant",
         messages=_build(messages),
         stream=True,
     )

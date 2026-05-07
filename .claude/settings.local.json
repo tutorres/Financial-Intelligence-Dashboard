@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install *)",
+      "Bash(pytest tests/ -v)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(pip index *)",
+      "Bash(git *)",
+      "Bash(python -m pytest tests/pipeline/test_utils.py -v)",
+      "Bash(python -m pytest tests/pipeline/test_ingest.py -v)",
+      "Bash(python -m pytest tests/pipeline/test_transform.py -v)",
+      "Bash(python -m pytest tests/pipeline/test_aggregate.py -v)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(C:\\\\Users\\\\arthu\\\\.claude\\\\plugins\\\\cache\\\\claude-plugins-official\\\\superpowers\\\\5.0.7\\\\skills\\\\brainstorming\\\\scripts\\\\start-server.sh *)",
+      "Bash(python -c \"import streamlit; import plotly; print\\('OK'\\)\")",
+      "Bash(python -m pytest tests/ -v --tb=short)",
+      "Bash(python -m pytest tests/dashboard/test_app.py -v)",
+      "Bash(python *)",
+      "Bash(pytest tests/ -q)",
+      "Bash(timeout 20 streamlit run dashboard/app.py --server.headless true)",
+      "Bash(gh pr create --title 'Phase 1 + 2: Bronze→Silver→Gold pipeline and Streamlit dashboard' --body ' *)",
+      "Bash(bash *)",
+      "Bash(pytest *)",
+      "Bash(ls -d .worktrees)",
+      "Bash(ls -d worktrees)",
+      "Bash(python3)",
+      "Bash(python3 -c ' *)",
+      "Bash(C:UsersarthuAppDataLocalProgramsPythonPython310python.exe -c ' *)",
+      "Bash(gh pr create --title 'refactor: enforce single-responsibility per medallion layer' --body ' *)"
+    ]
+  }
+}
