@@ -3,6 +3,7 @@ import os
 from collections.abc import Iterator
 from datetime import date, timedelta
 
+import duckdb
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,10 +25,10 @@ def _get_summary(conn, ticker: str) -> dict:
         "SELECT ticker, last_close, pct_change_1d, pct_change_7d, pct_change_30d, "
         "avg_volume_30d, current_rsi FROM gold.summary WHERE ticker = ?",
         [ticker],
-    ).fetchdf()
+    ).df()
     if row.empty:
         return {"error": "no data"}
-    return row.iloc[0].to_dict()
+    return row.astype(object).iloc[0].to_dict()
 
 
 def _get_recent_prices(conn, ticker: str, days: int = 30) -> list:
@@ -39,6 +40,7 @@ def _get_recent_prices(conn, ticker: str, days: int = 30) -> list:
         "ORDER BY date DESC LIMIT 30",
         [ticker, cutoff],
     ).df()
+    df["date"] = df["date"].astype(str)
     return df.to_dict(orient="records")
 
 
@@ -46,10 +48,10 @@ def _get_prediction(conn, ticker: str) -> dict:
     try:
         row = conn.execute(
             "SELECT signal, confidence, p_down, p_neutral, p_up, predicted_at "
-            "FROM gold.predictions WHERE ticker = ?",
+            "FROM gold.predictions WHERE ticker = ? ORDER BY predicted_at DESC LIMIT 1",
             [ticker],
-        ).fetchdf()
-    except Exception:
+        ).df()
+    except duckdb.CatalogException:
         return {"error": "no prediction available"}
     if row.empty:
         return {"error": "no prediction available"}

@@ -3,6 +3,8 @@ from datetime import date, timedelta
 import duckdb
 import pytest
 
+from chat.agent import _get_prediction, _get_recent_prices, _get_summary
+
 
 @pytest.fixture
 def conn():
@@ -41,7 +43,6 @@ def test_get_summary_tool(conn):
         INSERT INTO gold.summary VALUES
         ('AAPL', '2024-01-03', 185.0, 1.5, 3.2, 5.0, 1050000.0, 55.0)
     """)
-    from chat.agent import _get_summary
     result = _get_summary(conn, "AAPL")
     assert result["ticker"] == "AAPL"
     assert abs(result["last_close"] - 185.0) < 1e-9
@@ -50,7 +51,6 @@ def test_get_summary_tool(conn):
 
 
 def test_get_summary_tool_unknown_ticker(conn):
-    from chat.agent import _get_summary
     result = _get_summary(conn, "UNKNOWN")
     assert result == {"error": "no data"}
 
@@ -64,13 +64,19 @@ def test_get_recent_prices_tool_capped_at_30(conn):
             ('AAPL', ?, 100.0, 102.0, 99.0, 101.0, 1000000,
              0.01, 100.5, 100.3, 100.1, 55.0, 0.5, 0.4, 0.1, 0.015)
         """, [d])
-    from chat.agent import _get_recent_prices
     result = _get_recent_prices(conn, "AAPL", days=365)
     assert len(result) <= 30
     assert all("date" in row and "close" in row for row in result)
 
 
 def test_get_prediction_tool_no_table(conn):
-    from chat.agent import _get_prediction
     result = _get_prediction(conn, "AAPL")
     assert result == {"error": "no prediction available"}
+
+
+def test_get_prediction_tool_returns_data(conn):
+    conn.execute("CREATE TABLE gold.predictions (ticker VARCHAR PRIMARY KEY, signal VARCHAR, confidence DOUBLE, p_down DOUBLE, p_neutral DOUBLE, p_up DOUBLE, predicted_at TIMESTAMP)")
+    conn.execute("INSERT INTO gold.predictions VALUES ('AAPL', 'UP', 0.65, 0.10, 0.25, 0.65, '2024-01-03 12:00:00')")
+    result = _get_prediction(conn, "AAPL")
+    assert result["signal"] == "UP"
+    assert abs(result["confidence"] - 0.65) < 1e-9
