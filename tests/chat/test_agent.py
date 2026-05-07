@@ -80,3 +80,5 @@ def test_get_prediction_tool_returns_data(conn):
     result = _get_prediction(conn, "AAPL")
     assert result["signal"] == "UP"
     assert abs(result["confidence"] - 0.65) < 1e-9
+    import json
+    assert json.dumps(result)  # must not raise

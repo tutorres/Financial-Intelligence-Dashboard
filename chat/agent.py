@@ -55,4 +55,6 @@ def _get_prediction(conn, ticker: str) -> dict:
         return {"error": "no prediction available"}
     if row.empty:
         return {"error": "no prediction available"}
-    return row.iloc[0].to_dict()
+    d = row.astype(object).iloc[0].to_dict()
+    d["predicted_at"] = str(d["predicted_at"])
+    return d
