@@ -16,7 +16,10 @@ def run() -> None:
         transform(conn=conn)
         aggregate(conn=conn)
         ml_features(conn=conn)
-        predict(conn=conn)
+        try:
+            predict(conn=conn)
+        except Exception as exc:
+            logger.warning("Prediction step skipped: %s", exc)
         logger.info("Pipeline complete")
     except Exception as exc:
         logger.error("Pipeline failed: %s", exc)
