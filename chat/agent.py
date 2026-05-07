@@ -161,7 +161,7 @@ def ask(ticker: str, messages: list[dict], conn) -> Iterator[str]:
         return [{"role": "system", "content": _SYSTEM_PROMPT.format(ticker=ticker)}, *msgs]
 
     response = _client.chat.completions.create(
-        model="llama-3.1-8b-instan",
+        model="llama-3.1-8b-instant",
         messages=_build(messages),
         tools=_TOOLS,
         stream=False,
