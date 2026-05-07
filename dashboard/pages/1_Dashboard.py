@@ -217,11 +217,13 @@ def main() -> None:
                 messages.append({"role": "user", "content": prompt})
                 with st.chat_message("user"):
                     st.markdown(prompt)
+                history_len = len(messages)
                 try:
                     with st.chat_message("assistant"):
                         full_response = st.write_stream(_ask(ticker, messages, conn))
                     messages.append({"role": "assistant", "content": full_response})
                 except Exception as exc:
+                    del messages[history_len:]
                     st.error(f"Chat error: {exc}")
 
 
