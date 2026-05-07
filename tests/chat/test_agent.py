@@ -82,3 +82,31 @@ def test_get_prediction_tool_returns_data(conn):
     assert abs(result["confidence"] - 0.65) < 1e-9
     import json
     assert json.dumps(result)  # must not raise
+
+
+def test_ask_returns_iterator(monkeypatch):
+    import chat.agent as agent
+
+    class _FakeAssistant:
+        content = "AAPL fechou em alta de 1.50% hoje."
+        tool_calls = None
+
+    class _FakeResponse:
+        choices = [type("C", (), {"message": _FakeAssistant()})()]
+
+    class _FakeCompletions:
+        @staticmethod
+        def create(**kwargs):
+            return _FakeResponse()
+
+    class _FakeClient:
+        chat = type("Ch", (), {"completions": _FakeCompletions})()
+
+    monkeypatch.setattr(agent, "_client", _FakeClient())
+
+    conn = duckdb.connect(":memory:")
+    messages = [{"role": "user", "content": "Como está o AAPL hoje?"}]
+    result = list(agent.ask("AAPL", messages, conn))
+    assert isinstance(result, list)
+    assert all(isinstance(c, str) for c in result)
+    assert "".join(result) == "AAPL fechou em alta de 1.50% hoje."
